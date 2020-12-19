@@ -8,6 +8,7 @@ authors = ["Tim McFadden <mtik00@users.noreply.github.com>"]
 python = "^3.9"
 feedparser = "^6.0.2"
 requests = "^2.25.1"
+envargparse = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
