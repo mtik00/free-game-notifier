@@ -19,10 +19,14 @@ The following arguments are used to configure the run:
 *   `---url <path or URL>` : The RSS feed to scrape.  Can be a local file path  
     or remote URL.
 *   `--webhook <URL>` : The URL of the Slack webhook to which to send the message.
+*   `--verbose` : Enables more debug output; `--debug` is implied.
 
 ### Environment Variables
 
 *   `SFN_APP_DEBUG`: Whether or not to enable debug output.  This defaults to  
+    `False`.  You can enable it by setting it to anything _other_ than "no", "0",
+    or "false" (case-insensitive, only the first character is tested).
+*   `SFN_APP_VERBOSE`: Whether or not to enable verbose output.  This defaults to  
     `False`.  You can enable it by setting it to anything _other_ than "no", "0",
     or "false" (case-insensitive, only the first character is tested).
 *   `SFN_APP_URL`: The URL to scrape.  This can be a local file path 
