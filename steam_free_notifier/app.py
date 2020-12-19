@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+import logging
 import os
 import re
 import sys
-import logging
+from pprint import pformat
 
 import feedparser
 import requests
@@ -13,8 +14,6 @@ from .logger import get_logger
 
 __version__ = "0.1.0"
 
-URL = "https://steamcommunity.com/groups/freegamesfinders/rss/"
-SLACK_WEBHOOK = os.environ.get("SLACK_WEBHOOK") or None
 LOGGER = get_logger()
 
 
@@ -43,7 +42,7 @@ def bool_envvar_to_envargparser(*args):
 
 
 def parse_args(args=sys.argv[1:]):
-    bool_envvar_to_envargparser("SFN_APP_DEBUG")
+    bool_envvar_to_envargparser("SFN_APP_DEBUG", "SFN_APP_VERBOSE")
 
     parser = EnvArgParser(description="Scrap an RSS feed and post to a webhook.")
     parser.add_argument(
@@ -51,6 +50,14 @@ def parse_args(args=sys.argv[1:]):
         "--debug",
         help="Print debugging information.  Also set by $SFN_APP_DEBUG",
         env_var="SFN_APP_DEBUG",
+        default=False,
+        action="store_true",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        help="Print more debugging information.  Also set by $SFN_APP_VERBOSE",
+        env_var="SFN_APP_VERBOSE",
         default=False,
         action="store_true",
     )
@@ -69,7 +76,7 @@ def parse_args(args=sys.argv[1:]):
     return parser.parse_args(args)
 
 
-def main(feed_url, webook=None):
+def main(feed_url, webook=None, verbose=False):
     LOGGER.debug(f"reading feed from {feed_url}")
     feed = feedparser.parse(feed_url)
     first_item = feed["items"][0]
@@ -91,7 +98,7 @@ def main(feed_url, webook=None):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*{title}*\n{link}\n\nSteam link: {first_item['link']}",
+                    "text": f"*{title}*\n{link}\n\nSteam announcement: {first_item['link']}",
                 },
                 "accessory": {
                     "type": "image",
@@ -104,23 +111,26 @@ def main(feed_url, webook=None):
 
     if webook:
         LOGGER.debug("Sending slack message...")
+
+        if verbose:
+            LOGGER.debug(pformat(data))
+
         response = requests.post(webook, json=data)
         response.raise_for_status()
         LOGGER.debug("...done")
     else:
         LOGGER.debug("Not posting to webhook")
-        LOGGER.debug(data)
+        LOGGER.debug(pformat(data))
 
 
 def run():
     """Parse the arguments and call the main function."""
     args = parse_args()
-    args.url
 
-    if args.debug:
+    if args.debug or args.verbose:
         LOGGER.setLevel(logging.DEBUG)
 
-    main(feed_url=args.url, webook=args.webhook)
+    main(feed_url=args.url, webook=args.webhook, verbose=args.verbose)
 
 
 if __name__ == "__main__":
