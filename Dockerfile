@@ -3,7 +3,6 @@ FROM python:3.9.1-slim-buster as compile
 RUN python -m venv --copies /tmp/app-env
 
 ENV PATH=/tmp/app-env/bin:$PATH \
-    POETRY_VIRTUALENVS_PATH=/tmp/app-env \
     POETRY_VIRTUALENVS_CREATE=false
 
 WORKDIR /tmp/app-build
@@ -11,7 +10,7 @@ WORKDIR /tmp/app-build
 COPY ./pyproject.toml .
 
 RUN python -m pip install --no-compile --upgrade pip wheel poetry
-RUN poetry install --no-dev && \
+RUN poetry install --no-dev --no-root -n && \
     find . -name "*.py[co]" -o -name __pycache__ -exec rm -rf {} +
 
 # Make the virtual env portable
