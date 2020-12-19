@@ -3,6 +3,8 @@
 This module us used to scrape a certain Steam Community RSS feed and post
 the results to a Slack channel.
 
+> **_NOTE:_**  You must set up a Slack app and webhook before this can work.
+
 ## Configuration
 
 You can configure the application using only environment variables, only the
