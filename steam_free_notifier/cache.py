@@ -32,8 +32,9 @@ class Cache:
     def load(self, path):
         if path and os.path.exists(path):
             with open(path) as fh:
-                data = fh.read() or "{}"
-                data = json.loads(data)
+                data = fh.read().strip() or "{}"
+
+            data = json.loads(data)
         else:
             data = {}
 
