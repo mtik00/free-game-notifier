@@ -38,7 +38,11 @@ class Item:
 
     @staticmethod
     def from_rss_element(element):
-        pass
+        return Item(
+            title=element["title"],
+            summary=element["summary"],
+            slack_link=element["link"],
+        )
 
     @staticmethod
     def from_dict(data):
