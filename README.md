@@ -22,6 +22,7 @@ The following arguments are used to configure the run:
     or remote URL.
 *   `--webhook <URL>` : The URL of the Slack webhook to which to send the message.
 *   `--verbose` : Enables more debug output; `--debug` is implied.
+*   `--cache-path` : The path to a JSON file to store the cached messages.
 
 ### Environment Variables
 
@@ -34,3 +35,4 @@ The following arguments are used to configure the run:
 *   `SFN_APP_URL`: The URL to scrape.  This can be a local file path 
     or a URL.
 *   `SFN_APP_WEBHOOK`: The Slack webhook to send the information to.
+*   `SFN_APP_CACHE_PATH` : The path to a JSON file to store the cached messages.
