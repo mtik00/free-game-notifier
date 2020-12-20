@@ -5,14 +5,34 @@ A model that stores a single item.
 """
 import re
 
+import pendulum
+
 from .logger import get_logger
 
 LOGGER = get_logger()
 
 
-def parse_good_through(summary: str):
+def parse_good_through(summary: str) -> str:
+    """
+    Converts the "Good through" string in the announcement to the local timezone.
+
+    If we can parse the date, this function will return a string that looks like:
+
+        "Monday 21-Dec at 9AM MST"
+    """
+    # Pendulum doesn't handle the format.  We need to remove the timezone from
+    # the string and add it as a parameter and add the year.
+    # IOW, convert "December 21, 1600 GMT" to "December 21, 1600 2020".
     if match := re.search(r"Offer good through (.*?)\<br", summary):
-        return match.group(1)
+        parts = match.group(1).split()
+        tz = parts[-1]
+        new_date = " ".join(parts[:-1]) + f" {pendulum.now().year}"
+        try:
+            p = pendulum.from_format(new_date, fmt="MMMM D, Hmm YYYY", tz=tz)
+            return p.in_tz('local').format("dddd D-MMM at hA zz")
+        except Exception as e:
+            LOGGER.error("Could not parse the date: %s", e)
+
     return ""
 
 
