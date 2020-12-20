@@ -8,5 +8,8 @@ services:
       - SFN_APP_VERBOSE=1
       - SFN_APP_CACHE_PATH=/tmp/app_cache/app_cache.json
       # - SFN_APP_WEBHOOK=<URL of your existing webook>
+    command:
+      - python
+      - app.py
     volumes:
       - ${PWD}/app_cache:/tmp/app_cache
