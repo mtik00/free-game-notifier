@@ -114,6 +114,8 @@ def main(feed_url, webhook=None, verbose=False, cache_path=None):
     else:
         LOGGER.debug("No webhook defined...")
         LOGGER.debug(pformat(slack_data))
+        cache.add(item.to_dict())
+        cache.save()
 
 
 def run():

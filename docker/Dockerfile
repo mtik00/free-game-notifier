@@ -45,9 +45,10 @@ WORKDIR /usr/src/app
 
 COPY --from=compile --chown=steam_free:steam_free /tmp/app-env .venv
 COPY --chown=steam_free:steam_free ./steam_free_notifier ./steam_free_notifier
+COPY --chown=steam_free:steam_free ./docker/app.py .
 
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
-CMD [ "python", "-m", "steam_free_notifier" ]
+CMD [ "python", "app.py" ]
 
 # Stuff to help debug
 # RUN python -m pip install ipdb

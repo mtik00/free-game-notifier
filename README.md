@@ -36,3 +36,21 @@ The following arguments are used to configure the run:
     or a URL.
 *   `SFN_APP_WEBHOOK`: The Slack webhook to send the information to.
 *   `SFN_APP_CACHE_PATH` : The path to a JSON file to store the cached messages.
+
+## Docker
+
+The public image is located at `mtik00/steam-free-notifier`.
+
+You can build the image yourself with:
+
+    docker build -t my-steam-free-notifier -f docker/Dockerfile .
+
+## docker-compose
+
+This project also has a sample `docker-compose.yml` file that you can use.
+
+Copy the file to where you want to run it, modify the environment variables as appropriate for you, and set up the cache directory.
+
+    mkdir ./sfn_cache && touch ./sfn_cache/app_cache.json && chmod -R 666 ./sfn_cache
+
+This will allow you to persist the application cache on your local file system.  You can also create a Docker volume and modify docker-compose as needed.
