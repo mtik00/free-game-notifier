@@ -5,11 +5,14 @@ import os
 import re
 import sys
 from pprint import pformat
+import time
 
 import feedparser
 import requests
 from envargparse import EnvArgParser
 
+from .cache import Cache
+from .item import Item
 from .logger import get_logger
 
 LOGGER = get_logger()
@@ -70,54 +73,49 @@ def parse_args(args=sys.argv[1:]):
         help="The Slack webhook to post the message to.  Also set by $SFN_APP_WEBHOOK",
         env_var="SFN_APP_WEBHOOK",
     )
-
+    parser.add_argument(
+        "--cache-path",
+        help="The path to the cache file.  Also set by $SFN_APP_CACHE_PATH",
+        env_var="SFN_APP_CACHE_PATH",
+    )
     return parser.parse_args(args)
 
 
-def main(feed_url, webook=None, verbose=False):
+def main(feed_url, webhook=None, verbose=False, cache_path=None):
+    cache = Cache(path=cache_path)
+
     LOGGER.debug(f"reading feed from {feed_url}")
     feed = feedparser.parse(feed_url)
     first_item = feed["items"][0]
 
-    title = first_item["title"]
-    link = first_item["link"]
-
-    # See if we can parse the direct link.
-    if (
-        match := re.search(
-            'href="https://steamcommunity.*?url=(.*?)"', first_item["summary"]
+    cached_item = cache.get(first_item["title"])
+    if cached_item and cached_item["posted"]:
+        LOGGER.debug(
+            f"Item '{cached_item['title']}' already posted on {time.asctime(time.localtime(cached_item['posted']))}"
         )
-    ) :
-        link = match.group(1)
+        return
 
-    data = {
-        "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*{title}*\n{link}\n\nSteam announcement: {first_item['link']}",
-                },
-                "accessory": {
-                    "type": "image",
-                    "image_url": "https://store.steampowered.com/favicon.ico",
-                    "alt_text": "steam logo",
-                },
-            },
-        ]
-    }
+    item = Item(
+        title=first_item["title"],
+        summary=first_item["summary"],
+        slack_link=first_item["link"],
+    )
+    data = item.to_slack_message()
 
-    if webook:
+    if webhook:
         LOGGER.debug("Sending slack message...")
 
         if verbose:
             LOGGER.debug(pformat(data))
 
-        response = requests.post(webook, json=data)
+        response = requests.post(webhook, json=data)
         response.raise_for_status()
+        item.posted = time.time()
+        cache.add(item.to_dict())
+        cache.save()
         LOGGER.debug("...done")
     else:
-        LOGGER.debug("Not posting to webhook")
+        LOGGER.debug("No webhook defined...")
         LOGGER.debug(pformat(data))
 
 
@@ -128,7 +126,12 @@ def run():
     if args.debug or args.verbose:
         LOGGER.setLevel(logging.DEBUG)
 
-    main(feed_url=args.url, webook=args.webhook, verbose=args.verbose)
+    main(
+        feed_url=args.url,
+        webhook=args.webhook,
+        verbose=args.verbose,
+        cache_path=args.cache_path,
+    )
 
 
 if __name__ == "__main__":
