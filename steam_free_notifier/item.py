@@ -10,6 +10,12 @@ from .logger import get_logger
 LOGGER = get_logger()
 
 
+def parse_good_through(summary: str):
+    if match := re.search(r"Offer good through (.*?)\<br", summary):
+        return match.group(1)
+    return ""
+
+
 class Item:
     def __init__(
         self,
@@ -24,6 +30,7 @@ class Item:
         self.slack_link = slack_link
         self.game_link = game_link
         self.posted = posted
+        self.good_through = parse_good_through(self.summary)
 
         # See if we can parse the direct link.
         if (not game_link) and (
@@ -64,11 +71,12 @@ class Item:
         }
 
     def to_slack_message(self):
-        text = (
-            f"*{self.title}*\n{self.game_link}\n\nSteam announcement: {self.slack_link}"
+        body = "*{title}*\n{gamelink}{good_through}\n\nSteam announcement: {steam_link}".format(
+            title=self.title,
+            gamelink=f"{self.game_link}\n" if self.game_link else "",
+            good_through=f"Offer good through {self.good_through}\n" if self.good_through else "",
+            steam_link=self.slack_link,
         )
-        if not self.game_link:
-            text = f"*{self.title}*\n\nSteam announcement: {self.slack_link}"
 
         return {
             "text": self.title,
@@ -77,7 +85,7 @@ class Item:
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": text,
+                        "text": body,
                     },
                     "accessory": {
                         "type": "image",
