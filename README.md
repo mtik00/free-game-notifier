@@ -54,3 +54,12 @@ Copy the file to where you want to run it, modify the environment variables as a
     mkdir ./sfn_cache && touch ./sfn_cache/app_cache.json && chmod -R 666 ./sfn_cache
 
 This will allow you to persist the application cache on your local file system.  You can also create a Docker volume and modify docker-compose as needed.
+
+## Periodic Runs
+
+One way you can run this job periodically is by using a `cronjob` on the server combined with `docker-compose`.
+
+    # Run a job every morning at 9:00AM
+    0 9 * * * cd <docker compose directory> && docker-compose run --rm sfn > <docker compose directory>/log.txt 2>&1
+
+You can add those lines to cron by using `crontab -e` (assuming a POSIX operating sysetem).  Replace `<docker compose directory>` with the location you are storing `docker-compose.yml`.  The cron line above also creates/appends a log file named `log.txt` in the same directory.
