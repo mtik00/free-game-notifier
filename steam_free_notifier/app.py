@@ -86,29 +86,26 @@ def main(feed_url, webhook=None, verbose=False, cache_path=None):
 
     LOGGER.debug(f"reading feed from {feed_url}")
     feed = feedparser.parse(feed_url)
-    first_item = feed["items"][0]
 
-    cached_item = cache.get(first_item["title"])
-    if cached_item and cached_item["posted"]:
+    # We're only interested in the first item from the RSS feed.
+    item = Item.from_rss_element(feed["items"][0])
+
+    cached_data = cache.get(item.title)
+    if cached_data and cached_data["posted"]:
         LOGGER.debug(
-            f"Item '{cached_item['title']}' already posted on {time.asctime(time.localtime(cached_item['posted']))}"
+            f"Item '{cached_data['title']}' already posted on {time.asctime(time.localtime(cached_data['posted']))}"
         )
         return
 
-    item = Item(
-        title=first_item["title"],
-        summary=first_item["summary"],
-        slack_link=first_item["link"],
-    )
-    data = item.to_slack_message()
+    slack_data = item.to_slack_message()
 
     if webhook:
         LOGGER.debug("Sending slack message...")
 
         if verbose:
-            LOGGER.debug(pformat(data))
+            LOGGER.debug(pformat(slack_data))
 
-        response = requests.post(webhook, json=data)
+        response = requests.post(webhook, json=slack_data)
         response.raise_for_status()
         item.posted = time.time()
         cache.add(item.to_dict())
@@ -116,7 +113,7 @@ def main(feed_url, webhook=None, verbose=False, cache_path=None):
         LOGGER.debug("...done")
     else:
         LOGGER.debug("No webhook defined...")
-        LOGGER.debug(pformat(data))
+        LOGGER.debug(pformat(slack_data))
 
 
 def run():
