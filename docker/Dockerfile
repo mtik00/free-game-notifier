@@ -24,6 +24,7 @@ RUN sed -i '1s|.*python$|#!/usr/bin/env python|' /tmp/app-env/bin/*
 
 ###############################################################################
 FROM python:3.9.1-slim-buster
+ARG  USERID=9000
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -37,7 +38,7 @@ RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y tini \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -ms /bin/bash steam_free \
+RUN useradd --uid ${USERID} -ms /bin/bash steam_free \
     && echo "alias ll='ls -alh'" >> /home/steam_free/.bashrc \
     && echo 'PATH="/usr/src/app/.venv/bin:$PATH"' >> /home/steam_free/.bashrc
 
