@@ -1,4 +1,4 @@
-FROM python:3.9.1-slim-buster as compile
+FROM python:3.9.1-buster as compile
 
 RUN python -m venv --copies /tmp/app-env
 
