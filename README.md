@@ -36,6 +36,8 @@ The following arguments are used to configure the run:
     or a URL.
 *   `SFN_APP_WEBHOOK`: The Slack webhook to send the information to.
 *   `SFN_APP_CACHE_PATH` : The path to a JSON file to store the cached messages.
+*   `SFN_APP_LOCAL_TIMEZONE` : You can set the timezone of the logger to something
+    other than `UTC` with this env var.  E.g. `America/Denver`.
 
 ## Docker
 
