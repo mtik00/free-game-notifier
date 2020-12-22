@@ -31,6 +31,9 @@ def main(
     LOGGER.debug(f"reading feed from {url}")
     feed = feedparser.parse(url)
 
+    if len(feed["items"]) < 1:
+        raise Exception("No items found in feed")
+
     # We're only interested in the first item from the RSS feed.
     item = Item.from_rss_element(feed["items"][0])
 
