@@ -4,7 +4,7 @@ import os
 
 import pendulum
 
-LOCAL_TZ = os.environ.get("SFN_APP_LOCAL_TIMEZONE", "UTC").replace('"', '').replace("'", "")
+from .settings import LOCAL_TZ
 
 
 class Formatter(logging.Formatter):
