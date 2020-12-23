@@ -3,10 +3,8 @@ name: build our image
 on:
   push:
     branches: master
+  workflow_dispatch:
 
-name: Manually triggered workflow
-on:
-  workflow_dispatch
 
 jobs:
   build:
