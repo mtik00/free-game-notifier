@@ -4,6 +4,10 @@ on:
   push:
     branches: master
 
+name: Manually triggered workflow
+on:
+  workflow_dispatch
+
 jobs:
   build:
     runs-on: ubuntu-latest
