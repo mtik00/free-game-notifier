@@ -28,14 +28,13 @@ ARG  USERID=9000
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/usr/src/app/.venv/bin:$PATH" \
+    PATH="/usr/src/app/.venv/bin:$PATH:/usr/bin" \
     INSTANCE_FOLDER="/usr/src/app/instance"
 
 LABEL maintainer="Tim McFadden <mtik00@users.noreply.github.com>"
 LABEL app="steam-free-game-notifier"
 
-RUN apt-get update && apt-get install -y dpkg \
-    && apt-get upgrade -y \
+RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y tini \
     && rm -rf /var/lib/apt/lists/*
 
