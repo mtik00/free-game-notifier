@@ -6,4 +6,7 @@ build:
 	docker build -t mtik00/steam-free-notifier:latest -f docker/Dockerfile .
 
 push:
-	docker buildx build --platform ${PLATFORMS} -t mtik00/steam-free-notifier:latest --target compile -f docker/Dockerfile --push .
+	docker buildx build --platform ${PLATFORMS} -t mtik00/steam-free-notifier:latest -f docker/Dockerfile --push .
+
+arm:
+	docker buildx build --platform linux/arm64 -t mtik00/steam-free-notifier:latest -f docker/Dockerfile .
