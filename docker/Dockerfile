@@ -34,7 +34,7 @@ ENV PYTHONUNBUFFERED=1 \
 LABEL maintainer="Tim McFadden <mtik00@users.noreply.github.com>"
 LABEL app="steam-free-game-notifier"
 
-RUN apt-get update && apt-get upgrade -y \
+RUN apt-get update && apt-get upgrade -y  && apt-get install -y apt-utils \
     && apt-get install -y tini \
     && rm -rf /var/lib/apt/lists/*
 
