@@ -14,6 +14,7 @@ from .cache import Cache
 from .steam.item import Item as SteamItem
 from .steam.feed import Feed as SteamFeed
 from .logger import get_logger
+from .settings import settings
 
 LOGGER = get_logger()
 
@@ -27,17 +28,17 @@ def process_feed(feed):
 
 
 def main(
-    url: str = typer.Option(..., envvar="SFN_APP_URL"),
-    webhook: str = typer.Option(None, envvar="SFN_APP_WEBHOOK"),
-    verbose: bool = typer.Option(False, envvar="SFN_APP_VERBOSE"),
-    cache_path: str = typer.Option(None, envvar="SFN_APP_CACHE_PATH"),
-    settings_path: str = typer.Option(None, envvar="SFN_APP_SETTINGS_PATH"),
+    # url: str = typer.Option(..., envvar="SFN_APP_URL"),
+    # webhook: str = typer.Option(None, envvar="SFN_APP_WEBHOOK"),
+    # verbose: bool = typer.Option(False, envvar="SFN_APP_VERBOSE"),
+    # cache_path: str = typer.Option(None, envvar="SFN_APP_CACHE_PATH"),
+    # settings_path: str = typer.Option(None, envvar="SFN_APP_SETTINGS_PATH"),
 ):
-    cache = Cache(path=cache_path)
-    if verbose:
+    cache = Cache(path=settings["cache_path"])
+    if settings["verbose"] or settings["debug"]:
         LOGGER.setLevel(logging.DEBUG)
 
-    feed = SteamFeed(url, webhook)
+    feed = SteamFeed(settings["feeds"]["steam"]["url"])
     item = feed.get()
     cached_data = cache.get(item.title)
     if cached_data and cached_data["posted"]:
@@ -48,10 +49,11 @@ def main(
 
     slack_data = item.to_slack_message()
 
+    webhook = settings["notifiers"]["slack"]["url"]
     if webhook:
         LOGGER.debug("Sending slack message...")
 
-        if verbose:
+        if settings["verbose"]:
             LOGGER.debug(pformat(slack_data))
 
         response = requests.post(webhook, json=slack_data)

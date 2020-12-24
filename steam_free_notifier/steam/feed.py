@@ -9,12 +9,13 @@ import time
 import feedparser
 
 from ..logger import get_logger
+from ..abc.feed import Feed as BaseFeed
 from .item import Item
 
 LOGGER = get_logger()
 
 
-class Feed:
+class Feed(BaseFeed):
     url: str = "https://steamcommunity.com/groups/freegamesfinders/rss/"
 
     def __init__(self, cache, url=None, webook=None):
