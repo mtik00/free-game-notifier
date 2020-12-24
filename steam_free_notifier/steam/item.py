@@ -4,11 +4,14 @@
 A model that stores a single item.
 """
 import re
+import hashlib
 
 import pendulum
 
-from .logger import get_logger
-from .settings import LOCAL_TZ
+from ..logger import get_logger
+from ..settings import LOCAL_TZ
+from ..abc.item import Item as BaseItem
+from ..notifier.slack import Webhook as SteamWebhook
 
 LOGGER = get_logger()
 
@@ -37,7 +40,7 @@ def parse_good_through(summary: str) -> str:
     return ""
 
 
-class Item:
+class Item(BaseItem):
     def __init__(
         self,
         title: str,
@@ -91,11 +94,19 @@ class Item:
             "posted": self.posted or "",
         }
 
+    def format_message(self, notifier):
+        if isinstance(notifier, SteamWebhook):
+            return self.to_slack_message
+
+        raise NotImplementedError(f"Notifier type {type(notifier)} is not implemented")
+
     def to_slack_message(self):
         body = "*{title}*\n{gamelink}{good_through}\n\nSteam announcement: {steam_link}".format(
             title=self.title,
             gamelink=f"{self.game_link}\n" if self.game_link else "",
-            good_through=f"Offer good through {self.good_through}\n" if self.good_through else "",
+            good_through=f"Offer good through {self.good_through}\n"
+            if self.good_through
+            else "",
             steam_link=self.slack_link,
         )
 
@@ -116,3 +127,14 @@ class Item:
                 },
             ],
         }
+
+    def cache_key(self):
+        """
+        Returns the cachable key representing this item.
+        """
+        # Combine the title and the "good until" date.  That way subsequent
+        # offers will be presented.
+        h = hashlib.sha224()
+        h.update(self.title.encode("utf-8"))
+        h.update(self.good_through.encode("utf-8"))
+        return h.hexdigest()
