@@ -4,6 +4,7 @@
 This module retreives and reads a feed from the Steam freegames community.
 """
 import hashlib
+import logging
 import re
 import time
 
@@ -12,34 +13,10 @@ import pendulum
 
 from ..abc.feed import Feed as BaseFeed
 from ..abc.item import Item as BaseItem
-from ..logger import get_logger
-from ..notifier.slack import Webhook as SteamWebhook
+from ..notifier.slack import Notifier as SlackNotifier
 from ..settings import LOCAL_TZ
 
-LOGGER = get_logger()
-
-
-class Feed(BaseFeed):
-    url: str = "https://steamcommunity.com/groups/freegamesfinders/rss/"
-
-    def __init__(self, cache, url=None, webook=None):
-        self.cache = cache
-        self.url = url or Feed.url
-        self.webhook = webook
-        self.read(url)
-
-    def read(self, url=None):
-        self._feed = feedparser.parse(url or self.url)
-
-    def get(self, index=0) -> Item:
-        element = None
-        if len(self._feed.get("items", 0)) > index + 1:
-            element = self._feed["items"][index]
-
-        if element:
-            return Item.from_rss_element(element)
-
-        return element
+LOGGER = logging.getLogger("steam_free_notifier")
 
 
 def parse_good_through(summary: str) -> str:
@@ -121,8 +98,8 @@ class Item(BaseItem):
         }
 
     def format_message(self, notifier):
-        if isinstance(notifier, SteamWebhook):
-            return self.to_slack_message
+        if isinstance(notifier, SlackNotifier):
+            return self.to_slack_message()
 
         raise NotImplementedError(f"Notifier type {type(notifier)} is not implemented")
 
@@ -164,3 +141,26 @@ class Item(BaseItem):
         h.update(self.title.encode("utf-8"))
         h.update(self.good_through.encode("utf-8"))
         return h.hexdigest()
+
+
+class Feed(BaseFeed):
+    url: str = "https://steamcommunity.com/groups/freegamesfinders/rss/"
+
+    def __init__(self, cache, url=None, webook=None):
+        self.cache = cache
+        self.url = url or Feed.url
+        self.webhook = webook
+        self.read(url)
+
+    def read(self, url=None):
+        self._feed = feedparser.parse(url or self.url)
+
+    def get(self, index=0) -> Item:
+        element = None
+        if len(self._feed.get("items", 0)) > index + 1:
+            element = self._feed["items"][index]
+
+        if element:
+            return Item.from_rss_element(element)
+
+        return element

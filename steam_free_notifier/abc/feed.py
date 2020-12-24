@@ -13,7 +13,7 @@ class Feed(ABC):
     @abstractmethod
     def read(self, url):
         ...
-    
+
     @abstractmethod
     def get(self, index=0):
         ...

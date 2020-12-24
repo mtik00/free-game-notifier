@@ -11,20 +11,23 @@ import requests
 import typer
 
 from .cache import Cache
-from .steam.item import Item as SteamItem
-from .steam.feed import Feed as SteamFeed
+from .feed.steam import Item as SteamItem, Feed as SteamFeed
+from .notifier.slack import Notifier as SlackNotifier
 from .logger import get_logger
 from .settings import settings
 
 LOGGER = get_logger()
 
 
-def process_item(item):
-    pass
+class_map = {"feeds": {"steam": SteamFeed}, "notifiers": {"slack": SlackNotifier}}
 
 
-def process_feed(feed):
-    pass
+def get_class(category: str, name: str):
+    item = class_map.get(category, {}).get(name)
+    if not item:
+        raise NotImplementedError(f"class type {category}.{name} is not implemented")
+
+    return item
 
 
 def main(
@@ -38,35 +41,18 @@ def main(
     if settings["verbose"] or settings["debug"]:
         LOGGER.setLevel(logging.DEBUG)
 
-    feed = SteamFeed(settings["feeds"]["steam"]["url"])
-    item = feed.get()
-    cached_data = cache.get(item.title)
-    if cached_data and cached_data["posted"]:
-        LOGGER.debug(
-            f"Item '{cached_data['title']}' already posted on {time.asctime(time.localtime(cached_data['posted']))}"
+    for feed_setting in settings["feeds"]:
+        feed = get_class("feeds", feed_setting["type"])(
+            url=feed_setting.get("url"), cache=cache
         )
-        return
 
-    slack_data = item.to_slack_message()
+        item = feed.get(index=0)
 
-    webhook = settings["notifiers"]["slack"]["url"]
-    if webhook:
-        LOGGER.debug("Sending slack message...")
-
-        if settings["verbose"]:
-            LOGGER.debug(pformat(slack_data))
-
-        response = requests.post(webhook, json=slack_data)
-        response.raise_for_status()
-        item.posted = time.time()
-        cache.add(item.to_dict())
-        cache.save()
-        LOGGER.debug("...done")
-    else:
-        LOGGER.debug("No webhook defined...")
-        LOGGER.debug(pformat(slack_data))
-        cache.add(item.to_dict())
-        cache.save()
+        for notifier_settings in settings["notifiers"]:
+            notifier = get_class("notifiers", notifier_settings["type"])(
+                url=notifier_settings.get("url"), cache=cache
+            )
+            notifier.send(item)
 
 
 def run():

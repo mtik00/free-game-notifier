@@ -4,7 +4,7 @@ import os
 
 import pendulum
 
-from .settings import LOCAL_TZ
+from .settings import settings
 
 
 class Formatter(logging.Formatter):
@@ -12,7 +12,7 @@ class Formatter(logging.Formatter):
 
     def converter(self, timestamp):
         dt = pendulum.from_timestamp(timestamp)
-        return dt.in_tz(LOCAL_TZ)
+        return dt.in_tz(settings["timezone"])
 
     def formatTime(self, record, datefmt=None):
         dt = self.converter(record.created)

@@ -5,11 +5,10 @@ This module contains the cache for the application.
 The cache is a simple JSON file stored in the `data_dir` folder.
 """
 import json
+import logging
 import os
 
-from .logger import get_logger
-
-LOGGER = get_logger()
+LOGGER = logging.getLogger("steam_free_notifier")
 
 
 class Cache:
