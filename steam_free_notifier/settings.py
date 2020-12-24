@@ -15,15 +15,14 @@ LOCAL_TZ = (
 SETTINGS_PATH = os.environ.get("SFN_APP_SETTINGS_PATH")
 
 
-DEFAULTS = {
-    "timezone": "UTC"
-}
+DEFAULTS = {"timezone": "UTC"}
+
 
 class Settings:
     def __init__(self, path=None):
         self._settings = {}
         self.load(path)
-    
+
     def __getitem__(self, key):
         return self._settings.get(key)
 
