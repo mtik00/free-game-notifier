@@ -7,15 +7,23 @@ import sys
 import time
 from pprint import pformat
 
-import feedparser
 import requests
 import typer
 
 from .cache import Cache
-from .item import Item
+from .steam.item import Item as SteamItem
+from .steam.feed import Feed as SteamFeed
 from .logger import get_logger
 
 LOGGER = get_logger()
+
+
+def process_item(item):
+    pass
+
+
+def process_feed(feed):
+    pass
 
 
 def main(
@@ -23,20 +31,14 @@ def main(
     webhook: str = typer.Option(None, envvar="SFN_APP_WEBHOOK"),
     verbose: bool = typer.Option(False, envvar="SFN_APP_VERBOSE"),
     cache_path: str = typer.Option(None, envvar="SFN_APP_CACHE_PATH"),
+    settings_path: str = typer.Option(None, envvar="SFN_APP_SETTINGS_PATH"),
 ):
     cache = Cache(path=cache_path)
     if verbose:
         LOGGER.setLevel(logging.DEBUG)
 
-    LOGGER.debug(f"reading feed from {url}")
-    feed = feedparser.parse(url)
-
-    if len(feed["items"]) < 1:
-        raise Exception("No items found in feed")
-
-    # We're only interested in the first item from the RSS feed.
-    item = Item.from_rss_element(feed["items"][0])
-
+    feed = SteamFeed(url, webhook)
+    item = feed.get()
     cached_data = cache.get(item.title)
     if cached_data and cached_data["posted"]:
         LOGGER.debug(

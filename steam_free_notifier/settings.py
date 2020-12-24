@@ -8,3 +8,12 @@ import os
 LOCAL_TZ = (
     os.environ.get("SFN_APP_LOCAL_TIMEZONE", "UTC").replace('"', "").replace("'", "")
 )
+
+
+class Settings:
+    def __init__(self, path):
+        self._settings = {}
+    
+
+    def __getitem__(self, key):
+        return self._settings.get(key)
