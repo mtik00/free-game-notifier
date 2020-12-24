@@ -14,7 +14,7 @@ from .cache import Cache
 from .feed.steam import Item as SteamItem, Feed as SteamFeed
 from .notifier.slack import Notifier as SlackNotifier
 from .logger import get_logger
-from .settings import settings
+from .settings import get_settings
 
 LOGGER = get_logger()
 
@@ -31,14 +31,12 @@ def get_class(category: str, name: str):
 
 
 def main(
-    # url: str = typer.Option(..., envvar="SFN_APP_URL"),
-    # webhook: str = typer.Option(None, envvar="SFN_APP_WEBHOOK"),
-    # verbose: bool = typer.Option(False, envvar="SFN_APP_VERBOSE"),
-    # cache_path: str = typer.Option(None, envvar="SFN_APP_CACHE_PATH"),
-    # settings_path: str = typer.Option(None, envvar="SFN_APP_SETTINGS_PATH"),
+    settings_path: str = typer.Option(..., envvar="SFN_APP_SETTINGS_PATH"),
+    debug: bool = typer.Option(False, envvar="SFN_APP_DEBUG"),
 ):
+    settings = get_settings(settings_path)
     cache = Cache(path=settings["cache_path"])
-    if settings["verbose"] or settings["debug"]:
+    if debug or settings["debug"]:
         LOGGER.setLevel(logging.DEBUG)
 
     for feed_setting in settings["feeds"]:

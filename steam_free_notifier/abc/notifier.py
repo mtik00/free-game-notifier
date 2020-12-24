@@ -7,9 +7,9 @@ A base class to provide a default interface for a Notifier.
 from abc import ABC, abstractmethod
 
 from ..abc.item import Item
-import logging
+from ..logger import get_logger
 
-LOGGER = logging.getLogger("steam_free_notifier")
+LOGGER = get_logger()
 
 
 class Notifier:

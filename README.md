@@ -8,7 +8,7 @@ the results to a Slack channel.
 ## Configuration
 
 You can configure the application using only environment variables, only the
-command line, or a combination of both where command-line args take precedence
+settings file, or a combination of both where the settings file takes precedence
 over environment variables.
 
 The webhook parameter is not required.  Debug output will be logged instead of
@@ -17,19 +17,12 @@ sending the message.  You probably want to also add `--debug`.
 ### Command-line Arguments
 The following arguments are used to configure the run:
 
+*   `--settings-path` : The relative or absolute path to the settings file.
 *   `--debug` : Enables debug output.
-*   `---url <path or URL>` : The RSS feed to scrape.  Can be a local file path  
-    or remote URL.
-*   `--webhook <URL>` : The URL of the Slack webhook to which to send the message.
-*   `--verbose` : Enables more debug output; `--debug` is implied.
-*   `--cache-path` : The path to a JSON file to store the cached messages.
 
 ### Environment Variables
 
 *   `SFN_APP_DEBUG`: Whether or not to enable debug output.  This defaults to  
-    `False`.  You can enable it by setting it to anything _other_ than "no", "0",
-    or "false" (case-insensitive, only the first character is tested).
-*   `SFN_APP_VERBOSE`: Whether or not to enable verbose output.  This defaults to  
     `False`.  You can enable it by setting it to anything _other_ than "no", "0",
     or "false" (case-insensitive, only the first character is tested).
 *   `SFN_APP_URL`: The URL to scrape.  This can be a local file path 
@@ -40,6 +33,9 @@ The following arguments are used to configure the run:
     other than `UTC` with this env var.  E.g. `America/Denver`.  
     *NOTE*: This also sets the timezone for the "good through" message.
 
+### Settings File
+
+The settings file 
 ## Docker
 
 The public image is located at `mtik00/steam-free-notifier`.
