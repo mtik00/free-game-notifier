@@ -1,19 +1,45 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-A model that stores a single item.
+This module retreives and reads a feed from the Steam freegames community.
 """
-import re
 import hashlib
+import re
+import time
 
+import feedparser
 import pendulum
 
-from ..logger import get_logger
-from ..settings import LOCAL_TZ
+from ..abc.feed import Feed as BaseFeed
 from ..abc.item import Item as BaseItem
+from ..logger import get_logger
 from ..notifier.slack import Webhook as SteamWebhook
+from ..settings import LOCAL_TZ
 
 LOGGER = get_logger()
+
+
+class Feed(BaseFeed):
+    url: str = "https://steamcommunity.com/groups/freegamesfinders/rss/"
+
+    def __init__(self, cache, url=None, webook=None):
+        self.cache = cache
+        self.url = url or Feed.url
+        self.webhook = webook
+        self.read(url)
+
+    def read(self, url=None):
+        self._feed = feedparser.parse(url or self.url)
+
+    def get(self, index=0) -> Item:
+        element = None
+        if len(self._feed.get("items", 0)) > index + 1:
+            element = self._feed["items"][index]
+
+        if element:
+            return Item.from_rss_element(element)
+
+        return element
 
 
 def parse_good_through(summary: str) -> str:
