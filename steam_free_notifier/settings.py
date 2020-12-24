@@ -7,19 +7,20 @@ import os
 
 from yaml import Loader, load
 
-SETTINGS_PATH = os.environ.get("SFN_APP_SETTINGS_PATH")
-
+from .boolean_utils import to_bool
 
 DEFAULTS = {
     "timezone": "UTC",
     "feeds": {"steam": {"url": os.environ.get("SFN_APP_URL")}},
     "notifiers": {"slack": {"url": os.environ.get("SFN_APP_WEBHOOK")}},
-    "verbose": os.environ.get("SFN_APP_VERBOSE"),
+    "debug": to_bool(os.environ.get("SFN_APP_DEBUG")),
 }
 
+__settings = None
 
-class Settings:
-    def __init__(self, path=None):
+
+class _Settings:
+    def __init__(self, path):
         self._settings = DEFAULTS
         self.load(path)
 
@@ -32,4 +33,16 @@ class Settings:
                 self._settings.update(load(fh, Loader=Loader))
 
 
-settings = Settings(SETTINGS_PATH)
+def get_settings(path=None):
+    """
+    This should be called to retreive the current settings object instead of
+    interacting directly with `__settings`.
+    """
+    global __settings
+
+    if __settings is None:
+        __settings = _Settings(path)
+    elif path:
+        __settings.load(path)
+
+    return __settings

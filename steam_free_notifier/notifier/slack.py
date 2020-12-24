@@ -3,15 +3,15 @@
 """
 A module that communicates with Slack.
 """
-import logging
 import time
 from pprint import pformat
 
 import requests
 
 from ..abc.notifier import Notifier as BaseNotifier
+from ..logger import get_logger
 
-LOGGER = logging.getLogger("steam_free_notifier")
+LOGGER = get_logger()
 
 
 class Notifier(BaseNotifier):
