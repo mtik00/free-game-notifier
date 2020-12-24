@@ -14,7 +14,7 @@ import pendulum
 from ..abc.feed import Feed as BaseFeed
 from ..abc.item import Item as BaseItem
 from ..notifier.slack import Notifier as SlackNotifier
-from ..settings import LOCAL_TZ
+from ..settings import settings
 
 LOGGER = logging.getLogger("steam_free_notifier")
 
@@ -36,7 +36,7 @@ def parse_good_through(summary: str) -> str:
         new_date = " ".join(parts[:-1]) + f" {pendulum.now().year}"
         try:
             p = pendulum.from_format(new_date, fmt="MMMM D, Hmm YYYY", tz=tz)
-            return p.in_tz(LOCAL_TZ).format("dddd D-MMM at hA zz")
+            return p.in_tz(settings["timezone"]).format("dddd D-MMM at hA zz")
         except Exception as e:
             LOGGER.error("Could not parse the date: %s", e)
 
