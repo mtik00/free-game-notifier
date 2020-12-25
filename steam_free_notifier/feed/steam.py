@@ -9,6 +9,7 @@ import time
 
 import feedparser
 import pendulum
+from jinja2 import Template
 
 from ..abc.feed import Feed as BaseFeed
 from ..abc.item import Item as BaseItem
@@ -18,6 +19,18 @@ from ..settings import get_settings
 
 LOGGER = get_logger()
 
+SLACK_BODY_TEMPLATE = """*{{title}}*
+{%- if game_link %}
+{{ game_link }}
+{%- endif %}
+{%- if good_through %}
+Offer good through {{ good_through }}
+{%- endif %}
+
+
+Steam annoucement:
+{{ steam_link }}
+"""
 
 def parse_good_through(summary: str) -> str:
     """
@@ -104,13 +117,12 @@ class Item(BaseItem):
         raise NotImplementedError(f"Notifier type {type(notifier)} is not implemented")
 
     def to_slack_message(self):
-        body = "*{title}*\n{gamelink}{good_through}\n\nSteam announcement: {steam_link}".format(
+        t = Template(SLACK_BODY_TEMPLATE)
+        body = t.render(
             title=self.title,
-            gamelink=f"{self.game_link}\n" if self.game_link else "",
-            good_through=f"Offer good through {self.good_through}\n"
-            if self.good_through
-            else "",
-            steam_link=self.slack_link,
+            game_link=self.game_link,
+            good_through=self.good_through,
+            steam_link=self.slack_link
         )
 
         return {
