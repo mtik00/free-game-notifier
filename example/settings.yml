@@ -1,0 +1,21 @@
+---
+# Use the "TZ Database name" from https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: America/Denver 
+# cache_path: 
+
+feeds:
+  steam:
+    # This shows how to use a local file for the RSS feed instead of the "live"
+    # feed.  This is helpful for testing, and should be changed once everything
+    # is working.  You'll first need to download the file with:
+    #   curl -o feed.xml https://steamcommunity.com/groups/freegamesfinders/rss/
+    url: /tmp/app_config/feed.xml
+    # url: https://steamcommunity.com/groups/freegamesfinders/rss/
+
+notifiers:
+  slack:
+    # This is the URL of your Slack webhook.  If empty, the message will be
+    # sent to stdout (you should use `debug: true` when doing so).
+    url:
+
+debug: true
