@@ -30,7 +30,7 @@ Links:
 {% if steam_store_link -%}
 - <{{steam_store_link}}|Steam Store Page for reference>
 {% endif -%}
-- <{{ game_link }}|Steam Announcement>
+- <{{ steam_link }}|Steam Announcement>
 
 """
 
