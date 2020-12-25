@@ -165,7 +165,12 @@ class Feed(BaseFeed):
         self.read(url)
 
     def read(self, url=None):
-        self._feed = feedparser.parse(url or self.url)
+        feed_url = url or self.url
+        self._feed = feedparser.parse(feed_url)
+        if not self._feed.items:
+            LOGGER.warn("No items found in %s", feed_url)
+        else:
+            LOGGER.debug("Found %d items in %s", len(self._feed.entries), feed_url)
 
     def get(self, index=0) -> Item:
         element = None
