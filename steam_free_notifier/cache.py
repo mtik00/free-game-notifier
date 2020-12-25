@@ -26,8 +26,8 @@ class Cache:
     def get(self, title):
         return self.data.get(title)
 
-    def add(self, d: dict):
-        self.data[d["title"]] = d
+    def add(self, key: str, d: dict):
+        self.data[key] = d
 
     def load(self, path):
         if path and os.path.exists(path):

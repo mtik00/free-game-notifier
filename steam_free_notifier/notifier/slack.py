@@ -21,6 +21,12 @@ class Notifier(BaseNotifier):
         if not item:
             LOGGER.error("item is not defined")
             return
+        
+        item_key = item.cache_key()
+
+        if self.cache.get(item_key):
+            LOGGER.debug("%s already posted", item.title)
+            return
 
         slack_data = item.format_message(self)
         LOGGER.debug(pformat(slack_data))
