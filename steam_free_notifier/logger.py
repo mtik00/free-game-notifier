@@ -61,7 +61,7 @@ def get_logger():
         handler.setFormatter(
             Formatter(
                 get_settings()["timezone"],
-                fmt="%(asctime)s {%(pathname)s:%(lineno)d} %(levelname)s: %(message)s",
+                fmt="%(asctime)s {%(pathname)20s:%(lineno)3s} %(levelname)s: %(message)s",
                 datefmt="%m/%d/%Y %H:%M:%S %Z",
             )
         )
