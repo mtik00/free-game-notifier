@@ -18,6 +18,10 @@ class Notifier(BaseNotifier):
     notifier_type: str = "slack"
 
     def send(self, item):
+        if not item:
+            LOGGER.error("item is not defined")
+            return
+
         slack_data = item.format_message(self)
         LOGGER.debug(pformat(slack_data))
 
