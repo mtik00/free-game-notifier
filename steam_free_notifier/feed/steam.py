@@ -61,13 +61,13 @@ class Item(BaseItem):
         self,
         title: str,
         summary: str,
-        slack_link: str,
+        steam_link: str,
         game_link: str = None,
         posted=None,
     ):
         self.title = title
         self.summary = summary
-        self.slack_link = slack_link
+        self.steam_link = steam_link
         self.game_link = game_link
         self.posted = posted
         self.good_through = parse_good_through(self.summary)
@@ -88,7 +88,7 @@ class Item(BaseItem):
         return Item(
             title=element["title"],
             summary=element["summary"],
-            slack_link=element["link"],
+            steam_link=element["link"],
         )
 
     @staticmethod
@@ -96,7 +96,7 @@ class Item(BaseItem):
         return Item(
             title=data["title"],
             summary=data["summary"],
-            slack_link=data["slack_link"],
+            steam_link=data["steam_link"],
             game_link=data["game_link"],
             posted=data.get("posted"),
         )
@@ -105,7 +105,7 @@ class Item(BaseItem):
         return {
             "title": self.title,
             "summary": self.summary,
-            "slack_link": self.slack_link,
+            "steam_link": self.steam_link,
             "game_link": self.game_link,
             "posted": self.posted or "",
         }
@@ -122,7 +122,7 @@ class Item(BaseItem):
             title=self.title,
             game_link=self.game_link,
             good_through=self.good_through,
-            steam_link=self.slack_link
+            steam_link=self.steam_link
         )
 
         return {
