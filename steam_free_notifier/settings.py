@@ -33,7 +33,7 @@ class _Settings:
                 self._settings.update(load(fh, Loader=Loader))
 
 
-def get_settings(path=None):
+def get_settings(path=os.environ.get("SFN_APP_SETTINGS_PATH")):
     """
     This should be called to retreive the current settings object instead of
     interacting directly with `__settings`.
