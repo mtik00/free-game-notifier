@@ -20,16 +20,13 @@ from ..settings import get_settings
 LOGGER = get_logger()
 
 SLACK_BODY_TEMPLATE = """*{{title}}*
-{%- if game_link %}
-{{ game_link }}
-{%- endif %}
 {%- if good_through %}
 Offer good through {{ good_through }}
 {%- endif %}
-
-
-Steam annoucement:
-{{ steam_link }}
+Links:
+{% if game_link %}- <{{game_link}}|Offer Redemption>{% endif %}
+- <{{ game_link }}|Steam Announcement> 
+{% if steam_store_link %}- <{{steam_store_link}}|Steam Store Page>{% endif %}
 """
 
 def parse_good_through(summary: str) -> str:
