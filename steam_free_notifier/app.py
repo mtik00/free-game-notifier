@@ -27,7 +27,7 @@ def main(
     cache = Cache(path=settings["cache_path"])
 
     for name, feed_class in feed_factory.items():
-        feed_url = settings["feeds"].get(name, {}).get("url")
+        feed_url = (settings["feeds"].get(name) or {}).get("url")
         feed = feed_class(url=feed_url, cache=cache)
         item = feed.get(index=0)
 
@@ -38,7 +38,7 @@ def main(
         LOGGER.debug(f"found {item.title}")
 
         for name, notifier_class in notifier_factory.items():
-            notifier_url = settings["notifiers"].get(name, {}).get("url")
+            notifier_url = (settings["notifiers"].get(name) or {}).get("url")
             notifier = notifier_class(url=notifier_url, cache=cache)
             notifier.send(item)
 
