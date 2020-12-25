@@ -26,5 +26,5 @@ class Notifier:
         """
         Stores the item in the cache as completed.
         """
-        self.cache.add(item.to_dict())
+        self.cache.add(item.cache_key(), item.to_dict())
         self.cache.save()
