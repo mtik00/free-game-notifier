@@ -4,12 +4,15 @@
 This module retreives and reads a feed from the Steam freegames community.
 """
 import hashlib
+import os
 import re
 import time
 
 import feedparser
 import pendulum
+import requests
 from jinja2 import Template
+from lxml import html
 
 from ..abc.feed import Feed as BaseFeed
 from ..abc.item import Item as BaseItem
@@ -23,6 +26,10 @@ SLACK_BODY_TEMPLATE = """*{{title}}*
 {%- if good_through %}
 Offer good through {{ good_through }}
 {%- endif %}
+{% if rating -%}
+Recent reviews: {{rating}}
+{%- endif %}
+
 Links:
 {% if game_link -%}
 - <{{game_link}}|Offer Redemption>
@@ -67,6 +74,22 @@ def parse_steam_store_link(summary: str) -> str:
         return match.group(1)
     else:
         LOGGER.warn("Could not parse steam store page")
+
+    return ""
+
+
+def steam_app_rating(html_text):
+    tree = html.fromstring(html_text)
+    items = tree.xpath(
+        '//div[contains(@class, "user_reviews_summary_bar")]'
+        '/div[contains(string(), "Recent Reviews")]'
+        '/span[contains(@class, "game_review_summary")]/text()'
+    )
+
+    if items:
+        return items[0]
+    else:
+        LOGGER.debug("Could not parse rating")
 
     return ""
 
@@ -133,9 +156,21 @@ class Item(BaseItem):
         raise NotImplementedError(f"Notifier type {type(notifier)} is not implemented")
 
     def to_slack_message(self):
+        rating = None
+        if self.steam_store_link and os.path.isfile(self.steam_store_link):
+            with open(self.steam_store_link) as fh:
+                html = fh.read()
+        elif self.steam_store_link:
+            response = requests.get(self.steam_store_link)
+            response.raise_for_status()
+            html = response.text
+
+        rating = steam_app_rating(html)
+
         t = Template(SLACK_BODY_TEMPLATE)
         body = t.render(
             title=self.title,
+            rating=rating,
             game_link=self.game_link,
             good_through=self.good_through,
             steam_link=self.steam_link,
