@@ -24,10 +24,16 @@ SLACK_BODY_TEMPLATE = """*{{title}}*
 Offer good through {{ good_through }}
 {%- endif %}
 Links:
-{% if game_link %}- <{{game_link}}|Offer Redemption>{% endif %}
-- <{{ game_link }}|Steam Announcement> 
-{% if steam_store_link %}- <{{steam_store_link}}|Steam Store Page>{% endif %}
+{% if game_link -%}
+- <{{game_link}}|Offer Redemption>
+{%- endif %}
+{% if steam_store_link -%}
+- <{{steam_store_link}}|Steam Store Page for reference>
+{% endif -%}
+- <{{ game_link }}|Steam Announcement>
+
 """
+
 
 def parse_good_through(summary: str) -> str:
     """
@@ -53,6 +59,18 @@ def parse_good_through(summary: str) -> str:
     return ""
 
 
+def parse_steam_store_link(summary: str) -> str:
+    """Search the summary for a steampowered URL."""
+    # Sample URL:
+    # href="https://store.steampowered.com/app/314660/Oddworld_New_n_Tasty/"
+    if match := re.search(r'href="(https://store.steampowered.*?)"', summary):
+        return match.group(1)
+    else:
+        LOGGER.warn("Could not parse steam store page")
+
+    return ""
+
+
 class Item(BaseItem):
     def __init__(
         self,
@@ -68,6 +86,7 @@ class Item(BaseItem):
         self.game_link = game_link
         self.posted = posted
         self.good_through = parse_good_through(self.summary)
+        self.steam_store_link = parse_steam_store_link(self.summary)
 
         # See if we can parse the direct link.
         if (not game_link) and (
@@ -119,7 +138,8 @@ class Item(BaseItem):
             title=self.title,
             game_link=self.game_link,
             good_through=self.good_through,
-            steam_link=self.steam_link
+            steam_link=self.steam_link,
+            steam_store_link=self.steam_store_link,
         )
 
         return {
