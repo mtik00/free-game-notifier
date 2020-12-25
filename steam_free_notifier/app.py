@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
-import os
-import re
-import sys
-import time
-from pprint import pformat
 
-import requests
 import typer
 
 from .cache import Cache
