@@ -28,6 +28,12 @@ def main(
         feed = feed_class(url=feed_url, cache=cache)
         item = feed.get(index=0)
 
+        if not item:
+            LOGGER.warn("No items found in %s", feed_url)
+            continue
+
+        LOGGER.debug(f"found {item.title}")
+
         for notifier_class in notifier_factory.values():
             notifier_url = settings["notifiers"].get(name, {}).get("url")
             notifier = notifier_class(url=notifier_url, cache=cache)
