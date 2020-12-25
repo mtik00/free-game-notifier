@@ -13,9 +13,9 @@ feeds:
     # url: https://steamcommunity.com/groups/freegamesfinders/rss/
 
 notifiers:
-  slack:
-    # This is the URL of your Slack webhook.  If empty, the message will be
-    # sent to stdout (you should use `debug: true` when doing so).
-    url:
+  slack_urls:
+    # This is a list of the URLs for your Slack webhooks.  If empty, the message
+    # will be sent to stdout (you should use `debug: true` when doing so).
+    - null
 
 debug: true

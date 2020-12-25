@@ -38,9 +38,12 @@ def main(
         LOGGER.debug(f"found {item.title}")
 
         for name, notifier_class in notifier_factory.items():
-            notifier_url = (settings["notifiers"].get(name) or {}).get("url")
-            notifier = notifier_class(url=notifier_url, cache=cache)
-            notifier.send(item)
+            # Check the urls.  Default to `None` if none are defined so the 
+            # output is logged.
+            urls = settings["notifiers"].get(name) or [{"url": None}]
+            for url in urls:
+                notifier = notifier_class(url=url["url"], cache=cache)
+                notifier.send(item)
 
 
 def run():
