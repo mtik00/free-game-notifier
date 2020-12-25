@@ -12,10 +12,13 @@ __logger = None
 
 class Formatter(logging.Formatter):
     """override logging.Formatter to use an aware datetime object"""
+    def __init__(self, timezone, *args, **kwargs):
+        self._timezone = timezone
+        super().__init__(*args, **kwargs)
 
     def converter(self, timestamp):
         dt = pendulum.from_timestamp(timestamp)
-        return dt.in_tz(get_settings()["timezone"])
+        return dt.in_tz(self._timezone)
 
     def formatTime(self, record, datefmt=None):
         dt = self.converter(record.created)
@@ -38,6 +41,7 @@ def get_logger():
         handler = logging.StreamHandler()
         handler.setFormatter(
             Formatter(
+                get_settings()["timezone"],
                 fmt="%(asctime)s %(levelname)s: %(message)s",
                 datefmt="%m/%d/%Y %H:%M:%S %Z",
             )
