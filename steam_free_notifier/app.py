@@ -18,10 +18,13 @@ def main(
     debug: bool = typer.Option(False, envvar="SFN_APP_DEBUG"),
 ):
     settings = get_settings(settings_path)
-    cache = Cache(path=settings["cache_path"])
 
     if debug or settings["debug"]:
         LOGGER.setLevel(logging.DEBUG)
+
+    LOGGER.debug("Loaded settings from %s", settings_path)
+
+    cache = Cache(path=settings["cache_path"])
 
     for name, feed_class in feed_factory.items():
         feed_url = settings["feeds"].get(name, {}).get("url")
@@ -34,7 +37,7 @@ def main(
 
         LOGGER.debug(f"found {item.title}")
 
-        for notifier_class in notifier_factory.values():
+        for name, notifier_class in notifier_factory.items():
             notifier_url = settings["notifiers"].get(name, {}).get("url")
             notifier = notifier_class(url=notifier_url, cache=cache)
             notifier.send(item)
