@@ -16,6 +16,7 @@ from lxml import html
 
 from ..abc.feed import Feed as BaseFeed
 from ..abc.item import Item as BaseItem
+from ..icons import icon_from_url
 from ..logger import get_logger
 from ..notifier.slack import Notifier as SlackNotifier
 from ..settings import get_settings
@@ -155,7 +156,7 @@ class Item(BaseItem):
             return self.to_slack_message()
 
         raise NotImplementedError(f"Notifier type {type(notifier)} is not implemented")
-    
+
     def get_steam_store_html(self):
         html = None
         if self.steam_store_link and os.path.isfile(self.steam_store_link):
@@ -170,7 +171,7 @@ class Item(BaseItem):
 
     def to_slack_message(self):
         rating = None
-        if (html := self.get_steam_store_html()):
+        if (html := self.get_steam_store_html()) :
             rating = steam_app_rating(html)
 
         t = Template(SLACK_BODY_TEMPLATE)
@@ -194,7 +195,7 @@ class Item(BaseItem):
                     },
                     "accessory": {
                         "type": "image",
-                        "image_url": "https://store.steampowered.com/favicon.ico",
+                        "image_url": icon_from_url(self.game_link),
                         "alt_text": "steam logo",
                     },
                 },
