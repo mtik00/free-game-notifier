@@ -74,6 +74,7 @@ def parse_steam_store_link(summary: str) -> str:
         return match.group(1)
     else:
         LOGGER.warn("Could not parse steam store page")
+        LOGGER.debug(summary)
 
     return ""
 
@@ -154,9 +155,9 @@ class Item(BaseItem):
             return self.to_slack_message()
 
         raise NotImplementedError(f"Notifier type {type(notifier)} is not implemented")
-
-    def to_slack_message(self):
-        rating = None
+    
+    def get_steam_store_html(self):
+        html = None
         if self.steam_store_link and os.path.isfile(self.steam_store_link):
             with open(self.steam_store_link) as fh:
                 html = fh.read()
@@ -165,7 +166,12 @@ class Item(BaseItem):
             response.raise_for_status()
             html = response.text
 
-        rating = steam_app_rating(html)
+        return html
+
+    def to_slack_message(self):
+        rating = None
+        if (html := self.get_steam_store_html()):
+            rating = steam_app_rating(html)
 
         t = Template(SLACK_BODY_TEMPLATE)
         body = t.render(
