@@ -34,8 +34,9 @@ class Notifier(BaseNotifier):
         if self.url:
             response = requests.post(self.url, json=slack_data)
             response.raise_for_status()
-            item.posted = pendulum.now(tz="UTC")
-            super().completed(item)
-            LOGGER.debug("...done")
         else:
             LOGGER.debug("`url` not defined; not notifying Slack")
+
+        item.posted = pendulum.now(tz="UTC").timestamp()
+        super().completed(item)
+        LOGGER.debug("...done")
