@@ -13,20 +13,8 @@ from .settings import get_settings
 LOGGER = get_logger()
 
 
-def main(
-    settings_path: str = typer.Option(..., envvar="SFN_APP_SETTINGS_PATH"),
-    debug: bool = typer.Option(False, envvar="SFN_APP_DEBUG"),
-):
-    settings = get_settings(settings_path)
-
-    if debug or settings["debug"]:
-        LOGGER.setLevel(logging.DEBUG)
-
-    LOGGER.debug("Loaded settings from %s", settings_path)
-
-    cache = Cache(path=settings["cache_path"], age=settings["cache_age"])
-    cache.invalidate()
-
+def process_all_feeds(settings, cache):
+    """Find all registered feeds and process them if settings exist for it."""
     for name, feed_class in feed_factory.items():
         feed_url = (settings["feeds"].get(name) or {}).get("url")
         feed = feed_class(url=feed_url)
@@ -65,6 +53,22 @@ def main(
                     # which notifier, etc.
                     cache.add(cache_key, item.to_dict())
                     cache.save()
+
+
+def main(
+    settings_path: str = typer.Option(..., envvar="SFN_APP_SETTINGS_PATH"),
+    debug: bool = typer.Option(False, envvar="SFN_APP_DEBUG"),
+):
+    settings = get_settings(settings_path)
+
+    if debug or settings["debug"]:
+        LOGGER.setLevel(logging.DEBUG)
+
+    LOGGER.debug("Loaded settings from %s", settings_path)
+
+    cache = Cache(path=settings["cache_path"], age=settings["cache_age"])
+    cache.invalidate()
+    process_all_feeds(settings, cache)
 
 
 def run():
