@@ -24,7 +24,7 @@ class Notifier(BaseNotifier):
 
         item_key = item.cache_key()
 
-        if self.cache.get(item_key):
+        if item_key in self.cache:
             LOGGER.debug("%s already posted", item.title)
             return
 
