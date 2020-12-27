@@ -17,7 +17,15 @@ LOGGER = get_logger()
 
 
 class Cache:
-    def __init__(self, path: Optional[str] = None, age: int = 90):
+    __instance = None
+
+    def __init__(self):
+        if Cache.__instance is None:
+            Cache.__instance = self
+        else:
+            LOGGER.warn("Cannot initialize Cache() more than once")
+
+    def configure(self, path: Optional[str] = None, age: int = 90):
         self.path = path
         self.data = self.load(self.path)
         self.age = age
@@ -101,3 +109,6 @@ class Cache:
             h.update(str(arg).encode("utf-8"))
 
         return h.hexdigest()
+
+
+cache = Cache()
