@@ -66,14 +66,14 @@ class Cache:
         if days_older_than:
             return
 
-        keys_to_remove = []
+        keys_to_remove = set([])
         cleanup_date = pendulum.now(tz="UTC").subtract(days=days_older_than)
 
         for key, item in self.data.items():
             posted_date = pendulum.from_timestamp(item["posted"])
             if item["posted"] and (posted_date < cleanup_date):
                 LOGGER.debug("invalidating %s (%s)", key, item["title"])
-                keys_to_remove.append(key)
+                keys_to_remove.add(key)
 
         if keys_to_remove:
             LOGGER.debug(
