@@ -32,21 +32,21 @@ ENV PYTHONUNBUFFERED=1 \
     INSTANCE_FOLDER="/usr/src/app/instance"
 
 LABEL maintainer="Tim McFadden <mtik00@users.noreply.github.com>"
-LABEL app="steam-free-game-notifier"
+LABEL app="free-game-notifier"
 
 RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y tini \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd --uid ${USERID} -ms /bin/bash steam_free \
-    && echo "alias ll='ls -alh'" >> /home/steam_free/.bashrc \
-    && echo 'PATH="/usr/src/app/.venv/bin:$PATH"' >> /home/steam_free/.bashrc
+RUN useradd --uid ${USERID} -ms /bin/bash free_game_notifier \
+    && echo "alias ll='ls -alh'" >> /home/free_game_notifier/.bashrc \
+    && echo 'PATH="/usr/src/app/.venv/bin:$PATH"' >> /home/free_game_notifier/.bashrc
 
 WORKDIR /usr/src/app
 
-COPY --from=compile --chown=steam_free:steam_free /tmp/app-env .venv
-COPY --chown=steam_free:steam_free ./steam_free_notifier ./steam_free_notifier
-COPY --chown=steam_free:steam_free ./docker/app.py .
+COPY --from=compile --chown=free_game_notifier:free_game_notifier /tmp/app-env .venv
+COPY --chown=free_game_notifier:free_game_notifier ./free_game_notifier ./free_game_notifier
+COPY --chown=free_game_notifier:free_game_notifier ./docker/app.py .
 
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
 CMD [ "python", "app.py" ]
@@ -54,4 +54,4 @@ CMD [ "python", "app.py" ]
 # Stuff to help debug
 # RUN python -m pip install ipdb
 
-USER steam_free
+USER free_game_notifier

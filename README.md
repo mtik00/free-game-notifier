@@ -1,4 +1,4 @@
-# steam-free-notifier
+# free-game-notifier
 
 This module us used to scrape a certain Steam Community RSS feed and post
 the results to a Slack channel.
@@ -41,11 +41,11 @@ You can use either an environment variable to command-line option when running t
 
 ## Docker
 
-The public image is located at `mtik00/steam-free-notifier`.
+The public image is located at `mtik00/free-game-notifier`.
 
 You can build the image yourself with:
 
-    docker build -t my-steam-free-notifier -f docker/Dockerfile .
+    docker build -t my-free-game-notifier -f docker/Dockerfile .
 
 ## docker-compose
 

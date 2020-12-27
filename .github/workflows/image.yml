@@ -25,5 +25,5 @@ jobs:
       - name: build the image
         run: |
           docker buildx build --push \
-            --tag mtik00/steam-free-notifier:latest \
+            --tag mtik00/free-game-notifier:latest \
             --platform linux/amd64,linux/arm64 -f docker/Dockerfile .
