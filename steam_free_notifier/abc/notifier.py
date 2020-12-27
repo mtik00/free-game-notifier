@@ -3,7 +3,6 @@
 """
 A base class to provide a default interface for a Notifier.
 """
-
 from abc import ABC, abstractmethod
 
 from ..abc.item import Item
@@ -21,10 +20,3 @@ class Notifier:
 
     def send(self, item: Item):
         LOGGER.debug("Would be sending item: %r", item)
-
-    def completed(self, item: Item):
-        """
-        Stores the item in the cache as completed.
-        """
-        self.cache.add(item.cache_key(), item.to_dict())
-        self.cache.save()

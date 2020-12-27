@@ -36,10 +36,3 @@ class Item(ABC):
     @abstractmethod
     def format_message(self):
         ...
-
-    @abstractmethod
-    def cache_key(self):
-        """
-        Returns the cachable key representing this item.
-        """
-        ...

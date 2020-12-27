@@ -17,15 +17,9 @@ LOGGER = get_logger()
 class Notifier(BaseNotifier):
     notifier_type: str = "slack"
 
-    def send(self, item):
+    def send(self, item) -> bool:
         if not item:
             LOGGER.error("item is not defined")
-            return
-
-        item_key = item.cache_key()
-
-        if item_key in self.cache:
-            LOGGER.debug("%s already posted", item.title)
             return
 
         slack_data = item.format_message(self)
@@ -38,5 +32,7 @@ class Notifier(BaseNotifier):
             LOGGER.debug("`url` not defined; not notifying Slack")
 
         item.posted = pendulum.now(tz="UTC").timestamp()
-        super().completed(item)
+
         LOGGER.debug("...done")
+
+        return True

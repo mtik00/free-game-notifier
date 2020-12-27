@@ -202,17 +202,6 @@ class Item(BaseItem):
             ],
         }
 
-    def cache_key(self):
-        """
-        Returns the cachable key representing this item.
-        """
-        # Combine the title and the "good until" date.  That way subsequent
-        # offers will be presented.
-        h = hashlib.sha224()
-        h.update(self.title.encode("utf-8"))
-        h.update(self.good_through.encode("utf-8"))
-        return h.hexdigest()
-
 
 class Feed(BaseFeed):
     url: str = "https://steamcommunity.com/groups/freegamesfinders/rss/"

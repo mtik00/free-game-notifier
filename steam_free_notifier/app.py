@@ -38,13 +38,33 @@ def main(
 
         LOGGER.debug(f"found {item.title}")
 
-        for name, notifier_class in notifier_factory.items():
+        for notifier_name, notifier_class in notifier_factory.items():
             # Check the urls.  Default to `None` if none are defined so the
             # output is logged.
-            urls = settings["notifiers"].get(name) or [{"url": None}]
+            urls = settings["notifiers"].get(notifier_name) or [{"url": None}]
             for url in urls:
-                notifier = notifier_class(url=url["url"], cache=cache)
-                notifier.send(item)
+                url = url["url"]  # TODO: This is stupid
+
+                # Make the cache item specific to this particular item, which needs
+                # to include the URL.  This way each "notifier/url/item" combo gets
+                # its own cached value.
+                cache_key = cache.get_key(item.title, item.posted, notifier_name, url)
+
+                if cache_key in cache:
+                    LOGGER.debug("...%s already send to %s", item.title, url)
+                    continue
+
+                notifier = notifier_class(url=url, cache=cache)
+                sent = notifier.send(item)
+
+                if sent:
+
+                    # TODO: Cache key needs to include the notifier somehow
+                    # i.e. we notified slack, but what about email?
+                    # should each notifier have a cache item, each feed item cache
+                    # which notifier, etc.
+                    cache.add(cache_key, item.to_dict())
+                    cache.save()
 
 
 def run():
