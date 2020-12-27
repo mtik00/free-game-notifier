@@ -1,7 +1,7 @@
 ---
 # Use the "TZ Database name" from https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 timezone: America/Denver 
-# cache_path: 
+cache_path: /tmp/app_cache/app_cache.json
 
 feeds:
   steam:
