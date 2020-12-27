@@ -16,11 +16,16 @@ DEFAULTS = {
     "debug": to_bool(os.environ.get("SFN_APP_DEBUG")),
 }
 
-__settings = None
-
 
 class _Settings:
-    def __init__(self, path):
+    __settings = None
+
+    def __init__(self):
+        if _Settings.__settings is None:
+            _Settings.__settings = self
+            _Settings.__settings.configure(path=None)
+
+    def configure(self, path):
         self._settings = DEFAULTS
         self.load(path)
 
@@ -33,16 +38,4 @@ class _Settings:
                 self._settings.update(load(fh, Loader=Loader))
 
 
-def get_settings(path=os.environ.get("SFN_APP_SETTINGS_PATH")):
-    """
-    This should be called to retreive the current settings object instead of
-    interacting directly with `__settings`.
-    """
-    global __settings
-
-    if __settings is None:
-        __settings = _Settings(path)
-    elif path:
-        __settings.load(path)
-
-    return __settings
+settings = _Settings()

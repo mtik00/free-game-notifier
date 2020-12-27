@@ -8,7 +8,7 @@ from .cache import cache
 from .feed import feed_factory
 from .logger import get_logger
 from .notifier import notifier_factory
-from .settings import get_settings
+from .settings import settings
 
 LOGGER = get_logger()
 
@@ -21,7 +21,7 @@ def process_notifier(cache_key, notifier, item):
         cache.save()
 
 
-def process_all_notifiers(settings, item):
+def process_all_notifiers(item):
     for notifier_name, notifier_class in notifier_factory.items():
         # Check the urls.  Default to `None` if none are defined so the
         # output is logged.
@@ -42,7 +42,7 @@ def process_all_notifiers(settings, item):
             process_notifier(cache_key, notifier, item)
 
 
-def process_feed(settings, name, feed_class):
+def process_feed(name, feed_class):
     """Process a single feed."""
     feed_url = (settings["feeds"].get(name) or {}).get("url")
     feed = feed_class(url=feed_url)
@@ -54,10 +54,10 @@ def process_feed(settings, name, feed_class):
 
     LOGGER.debug(f"found {item.title}")
 
-    process_all_notifiers(settings, item)
+    process_all_notifiers(item)
 
 
-def process_all_feeds(settings):
+def process_all_feeds():
     """Find all registered feeds and process them if settings exist for it."""
 
     # Compare the registered feeds to the settings.  Ignore any feeds that aren't
@@ -69,14 +69,14 @@ def process_all_feeds(settings):
 
     for name in feed_names:
         feed_class = feed_factory[name]
-        process_feed(settings, name, feed_class)
+        process_feed(name, feed_class)
 
 
 def main(
     settings_path: str = typer.Option(..., envvar="SFN_APP_SETTINGS_PATH"),
     debug: bool = typer.Option(False, envvar="SFN_APP_DEBUG"),
 ):
-    settings = get_settings(settings_path)
+    settings.configure(settings_path)
 
     if debug or settings["debug"]:
         LOGGER.setLevel(logging.DEBUG)
@@ -86,7 +86,7 @@ def main(
     cache.configure(path=settings["cache_path"], age=settings["cache_age"])
     cache.invalidate()
 
-    process_all_feeds(settings)
+    process_all_feeds()
 
 
 def run():
