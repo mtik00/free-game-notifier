@@ -39,7 +39,7 @@ def main(
         LOGGER.debug(f"found {item.title}")
 
         for name, notifier_class in notifier_factory.items():
-            # Check the urls.  Default to `None` if none are defined so the 
+            # Check the urls.  Default to `None` if none are defined so the
             # output is logged.
             urls = settings["notifiers"].get(name) or [{"url": None}]
             for url in urls:
