@@ -13,18 +13,15 @@ from .settings import get_settings
 LOGGER = get_logger()
 
 
-def process_feed(settings, cache, name, feed_class):
-    """Process a single feed."""
-    feed_url = (settings["feeds"].get(name) or {}).get("url")
-    feed = feed_class(url=feed_url)
-    item = feed.get(index=0)
+def process_notifier(cache, cache_key, notifier, item):
+    sent = notifier.send(item)
 
-    if not item:
-        LOGGER.warn("No items found in %s", feed_url)
-        return
+    if sent:
+        cache.add(cache_key, item.to_dict())
+        cache.save()
 
-    LOGGER.debug(f"found {item.title}")
 
+def process_all_notifiers(settings, cache, item):
     for notifier_name, notifier_class in notifier_factory.items():
         # Check the urls.  Default to `None` if none are defined so the
         # output is logged.
@@ -42,16 +39,22 @@ def process_feed(settings, cache, name, feed_class):
                 continue
 
             notifier = notifier_class(url=url)
-            sent = notifier.send(item)
+            process_notifier(cache, cache_key, notifier, item)
 
-            if sent:
 
-                # TODO: Cache key needs to include the notifier somehow
-                # i.e. we notified slack, but what about email?
-                # should each notifier have a cache item, each feed item cache
-                # which notifier, etc.
-                cache.add(cache_key, item.to_dict())
-                cache.save()
+def process_feed(settings, cache, name, feed_class):
+    """Process a single feed."""
+    feed_url = (settings["feeds"].get(name) or {}).get("url")
+    feed = feed_class(url=feed_url)
+    item = feed.get(index=0)
+
+    if not item:
+        LOGGER.warn("No items found in %s", feed_url)
+        return
+
+    LOGGER.debug(f"found {item.title}")
+
+    process_all_notifiers(settings, cache, item)
 
 
 def process_all_feeds(settings, cache):
@@ -82,6 +85,7 @@ def main(
 
     cache = Cache(path=settings["cache_path"], age=settings["cache_age"])
     cache.invalidate()
+
     process_all_feeds(settings, cache)
 
 
