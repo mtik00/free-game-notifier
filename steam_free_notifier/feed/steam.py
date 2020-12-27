@@ -57,7 +57,7 @@ def parse_good_through(summary: str) -> str:
     if match := re.search(r"Offer good through (.*?)\<br", summary):
         parts = match.group(1).split()
         tz = parts[-1]
-        new_date = " ".join(parts[:-1]) + f" {pendulum.now().year}"
+        new_date = " ".join(parts[:-1]) + f" {pendulum.now(tz=tz).year}"
         try:
             p = pendulum.from_format(new_date, fmt="MMMM D, Hmm YYYY", tz=tz)
             return p.in_tz(get_settings()["timezone"]).format("dddd D-MMM at hA zz")

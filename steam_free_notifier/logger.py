@@ -26,6 +26,7 @@ def shorten_path(path):
 
 class Formatter(logging.Formatter):
     """override logging.Formatter to use an aware datetime object"""
+
     def __init__(self, timezone, *args, **kwargs):
         self._timezone = timezone
         super().__init__(*args, **kwargs)

@@ -3,9 +3,9 @@
 """
 A module that communicates with Slack.
 """
-import time
 from pprint import pformat
 
+import pendulum
 import requests
 
 from ..abc.notifier import Notifier as BaseNotifier
@@ -21,7 +21,7 @@ class Notifier(BaseNotifier):
         if not item:
             LOGGER.error("item is not defined")
             return
-        
+
         item_key = item.cache_key()
 
         if self.cache.get(item_key):
@@ -34,7 +34,7 @@ class Notifier(BaseNotifier):
         if self.url:
             response = requests.post(self.url, json=slack_data)
             response.raise_for_status()
-            item.posted = time.time()
+            item.posted = pendulum.now(tz="UTC")
             super().completed(item)
             LOGGER.debug("...done")
         else:

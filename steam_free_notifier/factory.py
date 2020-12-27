@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
 class ClassFactory:
     def __init__(self):
         self.mapping = {}
@@ -16,7 +17,7 @@ class ClassFactory:
 
     def keys(self):
         return self.mapping.keys()
-    
+
     def values(self):
         return self.mapping.values()
 
