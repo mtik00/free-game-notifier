@@ -74,7 +74,7 @@ class Cache:
         """
         days_older_than = days_older_than or self.age
 
-        if days_older_than:
+        if not days_older_than:
             return
 
         keys_to_remove = set([])
