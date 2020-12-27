@@ -22,22 +22,29 @@ def process_notifier(cache_key, notifier, item):
 
 
 def process_all_notifiers(item):
-    for notifier_name, notifier_class in notifier_factory.items():
-        # Check the urls.  Default to `None` if none are defined so the
-        # output is logged.
-        urls = settings["notifiers"].get(notifier_name) or [{"url": None}]
-        for url in urls:
-            url = url["url"]  # TODO: This is stupid
+    # Compare the registered notifiers to the settings.  Ignore any notifiers
+    # that aren't in both locations.
+    notifier_factory_names = set(notifier_factory.keys())
+    notifier_settings_names = set(settings["notifiers"].keys())
+    notifier_names = notifier_factory_names & notifier_settings_names
 
+    for name in notifier_names:
+        urls = settings["notifiers"][name]
+
+        if not urls:
+            continue
+
+        for url in urls:
             # Make the cache item specific to this particular item, which needs
             # to include the URL.  This way each "notifier/url/item" combo gets
             # its own cached value.
-            cache_key = cache.get_key(item.title, item.posted, notifier_name, url)
+            cache_key = cache.get_key(item.title, item.posted, name, url)
 
             if cache_key in cache:
                 LOGGER.debug("...%s already send to %s", item.title, url)
                 continue
 
+            notifier_class = notifier_factory[name]
             notifier = notifier_class(url=url)
             process_notifier(cache_key, notifier, item)
 
