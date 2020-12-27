@@ -9,6 +9,7 @@ from yaml import Loader, load
 
 from .boolean_utils import to_bool
 
+DEFAULT_PATH = os.environ.get("SFN_APP_SETTINGS_PATH")
 DEFAULTS = {
     "timezone": "UTC",
     "feeds": {"steam": {"url": os.environ.get("SFN_APP_URL")}},
@@ -23,7 +24,7 @@ class _Settings:
     def __init__(self):
         if _Settings.__settings is None:
             _Settings.__settings = self
-            _Settings.__settings.configure(path=None)
+            _Settings.__settings.configure(path=DEFAULT_PATH)
 
     def configure(self, path):
         self._settings = DEFAULTS
