@@ -35,7 +35,10 @@ The following arguments are used to configure the run:
 
 ### Settings File
 
-The settings file 
+The settings file is a YAML file located somewhere on your filesystem.  See the sample settings file [in the example folder](example/settings.yml).
+
+You can use either an environment variable to command-line option when running this application.
+
 ## Docker
 
 The public image is located at `mtik00/steam-free-notifier`.
