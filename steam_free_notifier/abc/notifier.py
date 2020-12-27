@@ -14,9 +14,8 @@ LOGGER = get_logger()
 class Notifier:
     location: str
 
-    def __init__(self, url, cache):
+    def __init__(self, url):
         self.url = url
-        self.cache = cache
 
     def send(self, item: Item):
         LOGGER.debug("Would be sending item: %r", item)

@@ -29,7 +29,7 @@ def main(
 
     for name, feed_class in feed_factory.items():
         feed_url = (settings["feeds"].get(name) or {}).get("url")
-        feed = feed_class(url=feed_url, cache=cache)
+        feed = feed_class(url=feed_url)
         item = feed.get(index=0)
 
         if not item:
@@ -54,7 +54,7 @@ def main(
                     LOGGER.debug("...%s already send to %s", item.title, url)
                     continue
 
-                notifier = notifier_class(url=url, cache=cache)
+                notifier = notifier_class(url=url)
                 sent = notifier.send(item)
 
                 if sent:
