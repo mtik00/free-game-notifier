@@ -24,7 +24,8 @@ def main(
 
     LOGGER.debug("Loaded settings from %s", settings_path)
 
-    cache = Cache(path=settings["cache_path"])
+    cache = Cache(path=settings["cache_path"], age=settings["cache_age"])
+    cache.invalidate()
 
     for name, feed_class in feed_factory.items():
         feed_url = (settings["feeds"].get(name) or {}).get("url")

@@ -6,6 +6,9 @@ The cache is a simple JSON file stored in the `data_dir` folder.
 """
 import json
 import os
+from typing import Optional
+
+import pendulum
 
 from .logger import get_logger
 
@@ -13,9 +16,14 @@ LOGGER = get_logger()
 
 
 class Cache:
-    def __init__(self, path=None):
+    def __init__(self, path: Optional[str] = None, age: int = 90):
         self.path = path
         self.data = self.load(self.path)
+        self.age = age
+
+        if self.age:
+            self.invalidate()
+            self.save()
 
     def __setitem__(self, name, value):
         self.data[name] = value
@@ -48,3 +56,33 @@ class Cache:
                 fh.write(json_data)
         else:
             LOGGER.warn("Cache.save() called without specifying a JSON file.")
+
+    def invalidate(self, days_older_than: int = None):
+        """
+        Invalidate any cache items older than the specified number of days.
+        """
+        days_older_than = days_older_than or self.age
+
+        if days_older_than:
+            return
+
+        keys_to_remove = []
+        cleanup_date = pendulum.now(tz="UTC").subtract(days=days_older_than)
+
+        for key, item in self.data.items():
+            posted_date = pendulum.from_timestamp(item["posted"])
+            if item["posted"] and (posted_date < cleanup_date):
+                LOGGER.debug("invalidating %s (%s)", key, item["title"])
+                keys_to_remove.append(key)
+
+        if keys_to_remove:
+            LOGGER.debug(
+                "Invalidating %d cached entries older than %d days",
+                len(keys_to_remove),
+                self.age,
+            )
+
+            for key in keys_to_remove:
+                self.data.pop(key)
+
+            self.save()
