@@ -206,8 +206,7 @@ class Item(BaseItem):
 class Feed(BaseFeed):
     url: str = "https://steamcommunity.com/groups/freegamesfinders/rss/"
 
-    def __init__(self, cache, url=None, webook=None):
-        self.cache = cache
+    def __init__(self, url=None, webook=None):
         self.url = url or Feed.url
         self.webhook = webook
         self.read(url)
