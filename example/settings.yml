@@ -9,13 +9,15 @@ feeds:
     # feed.  This is helpful for testing, and should be changed once everything
     # is working.  You'll first need to download the file with:
     #   curl -o feed.xml https://steamcommunity.com/groups/freegamesfinders/rss/
-    url: /tmp/app_config/feed.xml
-    # url: https://steamcommunity.com/groups/freegamesfinders/rss/
+    # This section is a list of url-like items.  Each steam feed will be processed.
+    - /tmp/app_config/feed.xml
+    # - https://steamcommunity.com/groups/freegamesfinders/rss/
 
 notifiers:
   slack:
     # This is a list of the URLs for your Slack webhooks.  If empty, the message
     # will be sent to stdout (you should use `debug: true` when doing so).
+    # This is a list of url-like items.
     - null
 
 debug: true

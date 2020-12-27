@@ -21,6 +21,7 @@ server and ran with `docker-compose up`.
     ├── README.md
     ├── app_cache
     ├── docker-compose.yml
+    ├── feed.xml
     └── settings.yml
     ```
 1.  Modify `settings.yml` as needed
@@ -30,5 +31,5 @@ server and ran with `docker-compose up`.
     ```
 
 Once you verify everything is working as intended, modify `settings.yml` to your
-liking.  The two main things to change are `feeds.steam.url` (you'll want to use
-the actual RSS feed) and `notifiers.slack.url` for your actual Slack webhook.
+liking.  The two main things to change are `feeds.steam` (you'll want to use
+the actual RSS feed) and `notifiers.slack` for your actual Slack webhook.
