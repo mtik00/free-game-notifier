@@ -7,6 +7,7 @@ The cache is a simple JSON file stored in the `data_dir` folder.
 import json
 import os
 from typing import Optional
+from hashlib import sha224
 
 import pendulum
 
@@ -90,3 +91,13 @@ class Cache:
             self.save()
 
         return len(keys_to_remove)
+
+    def get_key(self, *args):
+        """
+        Generate a cache key by hashing all of the arguments.
+        """
+        h = sha224()
+        for arg in args:
+            h.update(str(arg).encode("utf-8"))
+
+        return h.hexdigest()
