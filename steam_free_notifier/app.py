@@ -4,7 +4,7 @@ import logging
 
 import typer
 
-from .cache import Cache
+from .cache import cache
 from .feed import feed_factory
 from .logger import get_logger
 from .notifier import notifier_factory
@@ -13,7 +13,7 @@ from .settings import get_settings
 LOGGER = get_logger()
 
 
-def process_notifier(cache, cache_key, notifier, item):
+def process_notifier(cache_key, notifier, item):
     sent = notifier.send(item)
 
     if sent:
@@ -21,7 +21,7 @@ def process_notifier(cache, cache_key, notifier, item):
         cache.save()
 
 
-def process_all_notifiers(settings, cache, item):
+def process_all_notifiers(settings, item):
     for notifier_name, notifier_class in notifier_factory.items():
         # Check the urls.  Default to `None` if none are defined so the
         # output is logged.
@@ -39,10 +39,10 @@ def process_all_notifiers(settings, cache, item):
                 continue
 
             notifier = notifier_class(url=url)
-            process_notifier(cache, cache_key, notifier, item)
+            process_notifier(cache_key, notifier, item)
 
 
-def process_feed(settings, cache, name, feed_class):
+def process_feed(settings, name, feed_class):
     """Process a single feed."""
     feed_url = (settings["feeds"].get(name) or {}).get("url")
     feed = feed_class(url=feed_url)
@@ -54,10 +54,10 @@ def process_feed(settings, cache, name, feed_class):
 
     LOGGER.debug(f"found {item.title}")
 
-    process_all_notifiers(settings, cache, item)
+    process_all_notifiers(settings, item)
 
 
-def process_all_feeds(settings, cache):
+def process_all_feeds(settings):
     """Find all registered feeds and process them if settings exist for it."""
 
     # Compare the registered feeds to the settings.  Ignore any feeds that aren't
@@ -69,7 +69,7 @@ def process_all_feeds(settings, cache):
 
     for name in feed_names:
         feed_class = feed_factory[name]
-        process_feed(settings, cache, name, feed_class)
+        process_feed(settings, name, feed_class)
 
 
 def main(
@@ -83,10 +83,10 @@ def main(
 
     LOGGER.debug("Loaded settings from %s", settings_path)
 
-    cache = Cache(path=settings["cache_path"], age=settings["cache_age"])
+    cache.configure(path=settings["cache_path"], age=settings["cache_age"])
     cache.invalidate()
 
-    process_all_feeds(settings, cache)
+    process_all_feeds(settings)
 
 
 def run():
