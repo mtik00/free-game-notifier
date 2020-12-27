@@ -21,8 +21,7 @@ class Cache:
         self.data = self.load(self.path)
         self.age = age
 
-        if self.age:
-            self.invalidate()
+        if self.invalidate():
             self.save()
 
     def __setitem__(self, name, value):
@@ -30,6 +29,9 @@ class Cache:
 
     def __getitem__(self, name):
         return self.data.get(name)
+
+    def __contains__(self, key):
+        return key in self.data
 
     def get(self, title):
         return self.data.get(title)
@@ -86,3 +88,5 @@ class Cache:
                 self.data.pop(key)
 
             self.save()
+
+        return len(keys_to_remove)
