@@ -42,14 +42,13 @@ def process_all_notifiers(item):
             process_notifier(cache_key, notifier, item)
 
 
-def process_feed(name, feed_class):
+def process_feed(name, feed_class, url):
     """Process a single feed."""
-    feed_url = (settings["feeds"].get(name) or {}).get("url")
-    feed = feed_class(url=feed_url)
+    feed = feed_class(url=url)
     item = feed.get(index=0)
 
     if not item:
-        LOGGER.warn("No items found in %s", feed_url)
+        LOGGER.warn("No items found in %s", url)
         return
 
     LOGGER.debug(f"found {item.title}")
@@ -69,7 +68,8 @@ def process_all_feeds():
 
     for name in feed_names:
         feed_class = feed_factory[name]
-        process_feed(name, feed_class)
+        for url in settings["feeds"][name]:
+            process_feed(name, feed_class, url)
 
 
 def main(
