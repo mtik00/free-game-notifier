@@ -16,7 +16,7 @@ def shorten_path(path):
     I want to convert an asbolute path to a kind of module-relative path.
 
     Something like:
-        /usr/src/app/steam_free_notifier/notifier/slack.py
+        /usr/src/app/free_game_notifier/notifier/slack.py
     would be shortend to:
         notifier/slack.py
     """
@@ -57,7 +57,7 @@ def get_logger():
     global __logger
 
     if __logger is None:
-        __logger = logging.getLogger("steam_free_notifier")
+        __logger = logging.getLogger("free_game_notifier")
         handler = logging.StreamHandler()
         handler.setFormatter(
             Formatter(

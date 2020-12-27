@@ -2,7 +2,7 @@ version: "3.9"
    
 services:
   sfn:
-    image: mtik00/steam-free-notifier:latest
+    image: mtik00/free-game-notifier:latest
     environment:
       - SFN_APP_CACHE_PATH=/tmp/app_cache/app_cache.json
       - SFN_APP_SETTINGS_PATH=/tmp/app_config/settings.yml
