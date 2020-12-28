@@ -3,4 +3,9 @@
 This module is used to scrape the current free game from Epic Games and send a
 notification.
 """
-__version__ = "0.1.0"
+from importlib.metadata import version
+
+try:
+    __version__ = version(__name__)
+except:
+    pass
