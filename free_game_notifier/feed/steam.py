@@ -4,6 +4,7 @@
 This module retreives and reads a feed from the Steam freegames community.
 """
 import hashlib
+import logging
 import os
 import re
 import time
@@ -18,10 +19,9 @@ from ..abc.feed import Feed as BaseFeed
 from ..abc.item import Item as BaseItem
 from ..config import configuration
 from ..icons import icon_from_url
-from ..logger import get_logger
 from ..notifier.slack import Notifier as SlackNotifier
 
-LOGGER = get_logger()
+LOGGER = logging.getLogger(__name__)
 
 SLACK_BODY_TEMPLATE = """*{{title}}*
 {%- if good_through %}
