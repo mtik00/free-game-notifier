@@ -4,8 +4,7 @@ import os
 
 import pendulum
 
-from .settings import settings
-
+from .config import configuration
 
 __logger = None
 
@@ -61,7 +60,7 @@ def get_logger():
         handler = logging.StreamHandler()
         handler.setFormatter(
             Formatter(
-                settings["timezone"],
+                configuration["timezone"],
                 fmt="%(asctime)s {%(pathname)20s:%(lineno)3s} %(levelname)s: %(message)s",
                 datefmt="%m/%d/%Y %H:%M:%S %Z",
             )
