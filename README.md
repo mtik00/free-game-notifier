@@ -32,6 +32,8 @@ The following arguments are used to configure the run:
 *   `SFN_APP_LOCAL_TIMEZONE` : You can set the timezone of the logger to something
     other than `UTC` with this env var.  E.g. `America/Denver`.  
     *NOTE*: This also sets the timezone for the "good through" message.
+*   `SFN_APP_CONFIG_PATH` : The application configuration YAML file to use on
+    application start.
 
 ### Settings File
 

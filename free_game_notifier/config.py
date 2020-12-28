@@ -42,7 +42,7 @@ from collections.abc import MutableMapping
 
 import yaml
 
-DEFAULT_PATH = os.environ.get("SFN_APP_SETTINGS_PATH")
+DEFAULT_PATH = os.environ.get("SFN_APP_CONFIG_PATH")
 DEFAULT = """
 ---
 timezone: "UTC"
