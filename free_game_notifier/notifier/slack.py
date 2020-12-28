@@ -3,15 +3,15 @@
 """
 A module that communicates with Slack.
 """
+import logging
 from pprint import pformat
 
 import pendulum
 import requests
 
 from ..abc.notifier import Notifier as BaseNotifier
-from ..logger import get_logger
 
-LOGGER = get_logger()
+LOGGER = logging.getLogger(__name__)
 
 
 class Notifier(BaseNotifier):

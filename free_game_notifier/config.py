@@ -37,11 +37,13 @@ This method tries to determine if the item being dereferenced is a list.  In tha
 case, and the key is an integer, the method will assume you are indexing into
 the sequence and return the specified item.  See the example above.
 """
+import logging
 import os
 from collections.abc import MutableMapping
 
 import yaml
 
+LOGGER = logging.getLogger(__name__)
 DEFAULT_PATH = os.environ.get("SFN_APP_CONFIG_PATH")
 DEFAULT = """
 ---
@@ -67,6 +69,8 @@ class Configuration(MutableMapping):
             self.raise_on_keyerror = bool(raise_on_keyerror)
             self.load_config(config or DEFAULT_PATH or DEFAULT)
             Configuration.__instance = self
+        else:
+            LOGGER.warn("Configuration.__init__ called again")
 
     def __getitem__(self, key):
         return self._config.__getitem__(key)

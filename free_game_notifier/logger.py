@@ -48,24 +48,17 @@ class Formatter(logging.Formatter):
         return s
 
 
-def get_logger():
-    """
-    You can use this function to retreive the application logger while ensuring
-    it is set up correctly.
-    """
-    global __logger
+def set_root_level(level):
+    logging.getLogger().setLevel(level)
 
-    if __logger is None:
-        __logger = logging.getLogger("free_game_notifier")
-        handler = logging.StreamHandler()
-        handler.setFormatter(
-            Formatter(
-                configuration["timezone"],
-                fmt="%(asctime)s {%(pathname)20s:%(lineno)3s} %(levelname)s: %(message)s",
-                datefmt="%m/%d/%Y %H:%M:%S %Z",
-            )
-        )
 
-        logging.basicConfig(level=logging.INFO, handlers=[handler])
+handler = logging.StreamHandler()
+handler.setFormatter(
+    Formatter(
+        configuration.get("timezone", "UTC"),
+        fmt="%(asctime)s {%(pathname)20s:%(lineno)3s} %(levelname)s: %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S %Z",
+    )
+)
 
-    return __logger
+logging.basicConfig(level=logging.INFO, handlers=[handler])

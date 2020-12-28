@@ -5,15 +5,14 @@ This module contains the cache for the application.
 The cache is a simple JSON file stored in the `data_dir` folder.
 """
 import json
+import logging
 import os
-from typing import Optional
 from hashlib import sha224
+from typing import Optional
 
 import pendulum
 
-from .logger import get_logger
-
-LOGGER = get_logger()
+LOGGER = logging.getLogger(__name__)
 
 
 class Cache:

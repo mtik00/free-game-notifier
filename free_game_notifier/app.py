@@ -7,10 +7,10 @@ import typer
 from .cache import cache
 from .config import configuration
 from .feed import feed_factory
-from .logger import get_logger
+from .logger import set_root_level
 from .notifier import notifier_factory
 
-LOGGER = get_logger()
+LOGGER = logging.getLogger(__name__)
 
 
 def process_notifier(cache_key, notifier, item):
@@ -87,7 +87,7 @@ def main(
         configuration["debug"] = True
 
     if configuration["debug"]:
-        LOGGER.setLevel(logging.DEBUG)
+        set_root_level(logging.DEBUG)
 
     LOGGER.debug("Loaded configuration from %s", config_path)
 
