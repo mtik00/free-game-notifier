@@ -18,3 +18,6 @@ push:
 
 arm:
 	docker buildx build --platform linux/arm64 -t mtik00/free-game-notifier:latest -f docker/Dockerfile .
+
+tag:
+	git tag v$(shell poetry version -s)
