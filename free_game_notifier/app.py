@@ -5,10 +5,10 @@ import logging
 import typer
 
 from .cache import cache
+from .config import configuration
 from .feed import feed_factory
 from .logger import get_logger
 from .notifier import notifier_factory
-from .settings import settings
 
 LOGGER = get_logger()
 
@@ -25,14 +25,12 @@ def process_all_notifiers(item):
     # Compare the registered notifiers to the settings.  Ignore any notifiers
     # that aren't in both locations.
     notifier_factory_names = set(notifier_factory.keys())
-    notifier_settings_names = set(settings["notifiers"].keys())
+    notifier_settings_names = set(configuration["notifiers"].keys())
     notifier_names = notifier_factory_names & notifier_settings_names
 
     for name in notifier_names:
-        urls = settings["notifiers"][name]
-
-        if not urls:
-            continue
+        # default to at least [None] so the notifier will dump to the log file
+        urls = configuration["notifiers"][name] or [None]
 
         for url in urls:
             # Make the cache item specific to this particular item, which needs
@@ -69,13 +67,13 @@ def process_all_feeds():
     # Compare the registered feeds to the settings.  Ignore any feeds that aren't
     # in both locations.
     feed_factory_names = set(feed_factory.keys())
-    feed_settings_names = set(settings["feeds"].keys())
+    feed_settings_names = set(configuration["feeds"].keys())
 
     feed_names = feed_factory_names & feed_settings_names
 
     for name in feed_names:
         feed_class = feed_factory[name]
-        for url in settings["feeds"][name]:
+        for url in configuration["feeds"][name]:
             process_feed(name, feed_class, url)
 
 
@@ -83,14 +81,17 @@ def main(
     settings_path: str = typer.Option(..., envvar="SFN_APP_SETTINGS_PATH"),
     debug: bool = typer.Option(False, envvar="SFN_APP_DEBUG"),
 ):
-    settings.configure(settings_path)
+    configuration.load_config(settings_path)
 
-    if debug or settings["debug"]:
+    if debug:
+        configuration["debug"] = True
+
+    if configuration["debug"]:
         LOGGER.setLevel(logging.DEBUG)
 
-    LOGGER.debug("Loaded settings from %s", settings_path)
+    LOGGER.debug("Loaded configuration from %s", settings_path)
 
-    cache.configure(path=settings["cache_path"], age=settings["cache_age"])
+    cache.configure(path=configuration["cache_path"], age=configuration["cache_age"])
     cache.invalidate()
 
     process_all_feeds()

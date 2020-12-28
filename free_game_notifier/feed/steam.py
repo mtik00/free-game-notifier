@@ -16,10 +16,10 @@ from lxml import html
 
 from ..abc.feed import Feed as BaseFeed
 from ..abc.item import Item as BaseItem
+from ..config import configuration
 from ..icons import icon_from_url
 from ..logger import get_logger
 from ..notifier.slack import Notifier as SlackNotifier
-from ..settings import settings
 
 LOGGER = get_logger()
 
@@ -60,7 +60,7 @@ def parse_good_through(summary: str) -> str:
         new_date = " ".join(parts[:-1]) + f" {pendulum.now(tz=tz).year}"
         try:
             p = pendulum.from_format(new_date, fmt="MMMM D, Hmm YYYY", tz=tz)
-            return p.in_tz(settings["timezone"]).format("dddd D-MMM at hA zz")
+            return p.in_tz(configuration["timezone"]).format("dddd D-MMM at hA zz")
         except Exception as e:
             LOGGER.error("Could not parse the date: %s", e)
 
