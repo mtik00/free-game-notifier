@@ -39,7 +39,7 @@ def process_all_notifiers(item):
             cache_key = cache.get_key(item.title, item.posted, name, url)
 
             if cache_key in cache:
-                LOGGER.debug("...%s already send to %s", item.title, url)
+                LOGGER.debug("...%s already sent to %s", item.title, url)
                 continue
 
             notifier_class = notifier_factory[name]
