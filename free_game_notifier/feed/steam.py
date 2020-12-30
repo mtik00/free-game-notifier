@@ -228,3 +228,7 @@ class Feed(BaseFeed):
             return Item.from_rss_element(element)
 
         return element
+
+    def get_items(self, count=1) -> list[Item]:
+        for element in self._feed["items"][:count]:
+            yield Item.from_rss_element(element)

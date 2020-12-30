@@ -50,15 +50,15 @@ def process_all_notifiers(item):
 def process_feed(name, feed_class, url):
     """Process a single feed."""
     feed = feed_class(url=url)
-    item = feed.get(index=0)
+    items = feed.get_items(count=10)
 
-    if not item:
+    if not items:
         LOGGER.warn("No items found in %s", url)
         return
 
-    LOGGER.debug(f"found {item.title}")
-
-    process_all_notifiers(item)
+    for item in items:
+        LOGGER.debug(f"found {item.title}")
+        process_all_notifiers(item)
 
 
 def process_all_feeds():

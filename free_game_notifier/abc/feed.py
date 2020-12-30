@@ -17,3 +17,7 @@ class Feed(ABC):
     @abstractmethod
     def get(self, index=0):
         ...
+
+    @abstractmethod
+    def get_items(self, count=1):
+        ...
