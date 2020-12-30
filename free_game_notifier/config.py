@@ -94,6 +94,9 @@ class Configuration(MutableMapping):
         elif isinstance(config, str):
             self._config = yaml.safe_load(config)
 
+        if not isinstance(self._config, dict):
+            raise ValueError(f"Could not parse config from: {config}")
+
     def by_path(self, path: str, raise_on_keyerror: bool = None):
         """
         Allows the use of nested keys.  E.g. "a.b.c"
