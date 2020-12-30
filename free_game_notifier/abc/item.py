@@ -5,17 +5,19 @@ A base class to provide a default interface for an Item.
 """
 
 from abc import ABC, abstractmethod, abstractstaticmethod
+
 from pendulum import DateTime
 
 
 class Item(ABC):
-    title: str
-    summary: str
-    origin_link: str
-    offer_link: str
-    posted: str
-    good_through: str
     good_through_datetime: DateTime
+    good_through: str
+    offer_link: str
+    origin_link: str
+    posted: str
+    published_datetime: DateTime
+    summary: str
+    title: str
 
     @abstractmethod
     def __eq__(self, other):
