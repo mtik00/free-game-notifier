@@ -5,6 +5,7 @@ A base class to provide a default interface for an Item.
 """
 
 from abc import ABC, abstractmethod, abstractstaticmethod
+from pendulum import DateTime
 
 
 class Item(ABC):
@@ -14,6 +15,7 @@ class Item(ABC):
     offer_link: str
     posted: str
     good_through: str
+    good_through_datetime: DateTime
 
     @abstractmethod
     def __eq__(self, other):
