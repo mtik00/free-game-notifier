@@ -8,6 +8,7 @@ ENV PATH=/tmp/app-env/bin:$PATH \
 WORKDIR /tmp/app-build
 
 COPY ./pyproject.toml .
+COPY ./poetry.lock .
 
 RUN python -m pip install --no-compile --upgrade pip wheel poetry
 RUN poetry install --no-dev --no-root -n && \
