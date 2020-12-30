@@ -195,7 +195,7 @@ class Item(BaseItem):
                     },
                     "accessory": {
                         "type": "image",
-                        "image_url": icon_from_url(self.game_link),
+                        "image_url": icon_from_url(self.game_link or self.steam_link),
                         "alt_text": "steam logo",
                     },
                 },
