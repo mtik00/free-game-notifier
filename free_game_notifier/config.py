@@ -67,7 +67,7 @@ class Configuration(MutableMapping):
 
     def __init__(self, config=None, raise_on_keyerror: bool = True):
         if Configuration.__instance is None:
-            self._config = {}
+            self._config = yaml.safe_load(DEFAULT)
             self.raise_on_keyerror = bool(raise_on_keyerror)
             self.load_config(config or DEFAULT_PATH or DEFAULT)
             Configuration.__instance = self
@@ -92,9 +92,9 @@ class Configuration(MutableMapping):
     def load_config(self, config):
         if os.path.isfile(config):
             with open(config) as fh:
-                self._config = yaml.safe_load(fh)
+                self._config.update(yaml.safe_load(fh))
         elif isinstance(config, str):
-            self._config = yaml.safe_load(config)
+            self._config.update(yaml.safe_load(config))
 
         if not isinstance(self._config, dict):
             raise ValueError(f"Could not parse config from: {config}")
