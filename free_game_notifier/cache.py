@@ -12,6 +12,9 @@ from typing import Optional
 
 import pendulum
 
+from .config import configuration
+
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -59,6 +62,10 @@ class Cache:
         return data
 
     def save(self):
+        if configuration["dry-run"]:
+            LOGGER.debug("not saving cache due to dry-run")
+            return
+
         if self.path:
             data = self.data or {}
             json_data = json.dumps(data)

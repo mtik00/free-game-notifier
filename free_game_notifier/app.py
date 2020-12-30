@@ -80,6 +80,7 @@ def process_all_feeds():
 def main(
     config_path: str = typer.Option(..., envvar="SFN_APP_CONFIG_PATH"),
     debug: bool = typer.Option(False, envvar="SFN_APP_DEBUG"),
+    dry_run: bool = typer.Option(False),
 ):
     configuration.load_config(config_path)
 
@@ -88,6 +89,8 @@ def main(
 
     if configuration["debug"]:
         set_root_level(logging.DEBUG)
+
+    configuration["dry-run"] = dry_run
 
     LOGGER.debug("Loaded configuration from %s", config_path)
 
