@@ -49,6 +49,7 @@ DEFAULT = """
 ---
 timezone: "UTC"
 cache_age: 30
+start_date: 2020-12-01
 feeds:
     steam:
         -

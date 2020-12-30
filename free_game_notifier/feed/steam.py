@@ -3,6 +3,7 @@
 """
 This module retreives and reads a feed from the Steam freegames community.
 """
+import datetime
 import hashlib
 import logging
 import os
@@ -68,6 +69,31 @@ def parse_good_through(summary: str) -> str:
     return "", None
 
 
+def parse_pubdate(pubdate: str) -> pendulum.DateTime:
+    """
+    Converts the pubDate element to a pendulum DateTime.
+
+    pubDate looks like this:
+
+        Wed, 30 Dec 2020 16:00:01 +0000
+    """
+    fmt = "ddd, DD MMM YYYY HH:mm:ss ZZ"
+    try:
+        return pendulum.from_format(pubdate, fmt)
+    except Exception:
+        LOGGER.warn("Could not parse pubdate: %s", pubdate)
+
+    return None
+
+
+def to_pendulum(date: datetime.date) -> pendulum.DateTime:
+    if not date:
+        return None
+
+    dt = datetime.datetime.combine(date, datetime.datetime.min.time())
+    return pendulum.instance(dt)
+
+
 def parse_steam_store_link(summary: str) -> str:
     """Search the summary for a steampowered URL."""
     # Sample URL:
@@ -106,7 +132,7 @@ class Item(BaseItem):
         game_link: str = None,
         posted=None,
         good_through: str = None,
-        good_through_datetime: pendulum.DateTime = None,
+        published: str = None,
     ):
         self.title = title
         self.summary = summary
@@ -115,6 +141,9 @@ class Item(BaseItem):
         self.posted = posted
         self.good_through, self.good_through_datetime = parse_good_through(self.summary)
         self.steam_store_link = parse_steam_store_link(self.summary)
+
+        self.published = published
+        self.published_datetime = parse_pubdate(self.published)
 
         # See if we can parse the direct link.
         if (not game_link) and (
@@ -133,6 +162,7 @@ class Item(BaseItem):
             title=element["title"],
             summary=element["summary"],
             steam_link=element["link"],
+            published=element["published"],
         )
 
     @staticmethod
@@ -143,6 +173,7 @@ class Item(BaseItem):
             steam_link=data["steam_link"],
             game_link=data["game_link"],
             posted=data.get("posted"),
+            published=data.get("published"),
         )
 
     def to_dict(self):
@@ -152,6 +183,7 @@ class Item(BaseItem):
             "steam_link": self.steam_link,
             "game_link": self.game_link,
             "posted": self.posted or "",
+            "published": self.published,
         }
 
     def format_message(self, notifier):
@@ -220,7 +252,33 @@ class Feed(BaseFeed):
         if not self._feed.items:
             LOGGER.warn("No items found in %s", feed_url)
         else:
+            self.filter_pubdate()
             LOGGER.debug("Found %d items in %s", len(self._feed.entries), feed_url)
+
+    def filter_pubdate(self):
+        """Filters out any of our items that were published prior to the setting."""
+        start_date = to_pendulum(configuration.get("start_date"))
+
+        if not start_date:
+            return
+
+        result = []
+
+        LOGGER.debug(
+            "filtering all items older than %s", start_date.format("YYYY-MMM-DD")
+        )
+        for item in self._feed["items"]:
+            pubdate = parse_pubdate(item["published"])
+            if not pubdate or (pubdate >= start_date):
+                result.append(item)
+            else:
+                LOGGER.debug(
+                    "Item too old: %s %s",
+                    item["title"][:10],
+                    pubdate.format("YYYY-MMM-DD"),
+                )
+
+        self._feed["items"] = result
 
     def get(self, index=0) -> Item:
         element = None
