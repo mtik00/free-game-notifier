@@ -10,6 +10,7 @@ import pendulum
 import requests
 
 from ..abc.notifier import Notifier as BaseNotifier
+from ..config import configuration
 
 LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +25,10 @@ class Notifier(BaseNotifier):
 
         slack_data = item.format_message(self)
         LOGGER.debug(pformat(slack_data))
+
+        if configuration["dry-run"]:
+            LOGGER.debug("dry-run: not sending slack message")
+            return
 
         if self.url:
             response = requests.post(self.url, json=slack_data)
