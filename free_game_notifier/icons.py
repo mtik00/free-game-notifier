@@ -9,6 +9,9 @@ def icon_from_url(url: str):
     We attempt to parse the URL and return the favicon.  If that fails, return
     a pre-determined image based on the URL.
     """
+    if not url:
+        return
+
     parts = urlparse(url)
     if parts.netloc:
         return f"{parts.scheme}://{parts.netloc}/favicon.ico"
