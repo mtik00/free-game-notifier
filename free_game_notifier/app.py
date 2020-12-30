@@ -2,6 +2,7 @@
 
 import logging
 
+import pendulum
 import typer
 
 from .cache import cache
@@ -50,14 +51,13 @@ def process_all_notifiers(item):
 def process_feed(name, feed_class, url):
     """Process a single feed."""
     feed = feed_class(url=url)
-    items = feed.get_items(count=10)
+    items = feed.get_nonexpired_items(count=10)
 
     if not items:
         LOGGER.warn("No items found in %s", url)
         return
 
     for item in items:
-        LOGGER.debug(f"found {item.title}")
         process_all_notifiers(item)
 
 

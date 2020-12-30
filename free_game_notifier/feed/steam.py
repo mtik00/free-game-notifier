@@ -60,11 +60,12 @@ def parse_good_through(summary: str) -> str:
         new_date = " ".join(parts[:-1]) + f" {pendulum.now(tz=tz).year}"
         try:
             p = pendulum.from_format(new_date, fmt="MMMM D, Hmm YYYY", tz=tz)
-            return p.in_tz(configuration["timezone"]).format("dddd D-MMM at hA zz")
+            dt = p.in_tz(configuration["timezone"])
+            return dt.format("dddd D-MMM at hA zz"), dt
         except Exception as e:
             LOGGER.error("Could not parse the date: %s", e)
 
-    return ""
+    return "", None
 
 
 def parse_steam_store_link(summary: str) -> str:
@@ -74,7 +75,7 @@ def parse_steam_store_link(summary: str) -> str:
     if match := re.search(r'href="(https://store.steampowered.*?)"', summary):
         return match.group(1)
     else:
-        LOGGER.warn("Could not parse steam store page")
+        LOGGER.warn("Could not parse steam store page.  Here's the summary:")
         LOGGER.debug(summary)
 
     return ""
@@ -104,13 +105,15 @@ class Item(BaseItem):
         steam_link: str,
         game_link: str = None,
         posted=None,
+        good_through: str = None,
+        good_through_datetime: pendulum.DateTime = None,
     ):
         self.title = title
         self.summary = summary
         self.steam_link = steam_link
         self.game_link = game_link
         self.posted = posted
-        self.good_through = parse_good_through(self.summary)
+        self.good_through, self.good_through_datetime = parse_good_through(self.summary)
         self.steam_store_link = parse_steam_store_link(self.summary)
 
         # See if we can parse the direct link.
@@ -228,6 +231,21 @@ class Feed(BaseFeed):
             return Item.from_rss_element(element)
 
         return element
+
+    def get_nonexpired_items(self, count=1):
+        # Only send the notifier if the offer is still good.  No point otherwise.
+        # The issue is that not all feeds provide this.  If we couldn't parse the
+        # offer "good through" date, then post it anyway.
+        for element in self._feed["items"][:count]:
+            item = Item.from_rss_element(element)
+
+            if (not item.good_through_datetime) or (
+                pendulum.now(tz=configuration["timezone"]) < item.good_through_datetime
+            ):
+                LOGGER.debug(f"found: %s...", item.title[:20])
+                yield item
+            else:
+                LOGGER.debug(f"offer expired for %s...", item.title[:20])
 
     def get_items(self, count=1) -> list[Item]:
         for element in self._feed["items"][:count]:
