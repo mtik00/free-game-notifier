@@ -5,9 +5,9 @@ PLATFORMS = linux/amd64,linux/arm64
 
 build:
 
-	docker buildx build -t mtik00/free-game-notifier:latest -f docker/Dockerfile .
+	docker build -t mtik00/free-game-notifier:latest -f docker/Dockerfile .
     ifneq ($(VERSION),latest)
-	    docker buildx build -t mtik00/free-game-notifier:$(VERSION) -f docker/Dockerfile .
+	    docker build -t mtik00/free-game-notifier:$(VERSION) -f docker/Dockerfile .
     endif
 
 push:
