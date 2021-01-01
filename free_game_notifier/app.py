@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
+from contextlib import contextmanager
 
 import pendulum
 import typer
@@ -15,7 +16,12 @@ LOGGER = logging.getLogger(__name__)
 
 
 def process_notifier(cache_key, notifier, item):
-    sent = notifier.send(item)
+    sent = False
+
+    try:
+        sent = notifier.send(item)
+    except Exception:
+        LOGGER.error("Failed to send", exc_info=True)
 
     if sent:
         cache.add(cache_key, item.to_dict())
@@ -50,8 +56,12 @@ def process_all_notifiers(item):
 
 def process_feed(name, feed_class, url):
     """Process a single feed."""
-    feed = feed_class(url=url)
-    items = feed.get_nonexpired_items(count=10)
+    try:
+        feed = feed_class(url=url)
+        items = feed.get_nonexpired_items(count=10)
+    except Exception:
+        LOGGER.error("Could not parse %s", url, exc_info=True)
+        return
 
     if not items:
         LOGGER.warn("No items found in %s", url)
