@@ -28,9 +28,15 @@ SLACK_BODY_TEMPLATE = """*{{title}}*
 {%- if good_through %}
 Offer good through {{ good_through }}
 {%- endif %}
-{% if rating -%}
-Recent reviews: {{rating}}
-{%- endif %}
+{%- if ratings %}
+{% if ratings.recent and ratings.overall %}Recent reviews: {{ratings.recent}}
+Overall reviews: {{ratings.overall}}
+{%- elif ratings.recent %}
+Recent reviews: {{ratings.recent}}
+{%- else %}
+Overall reviews: {{ratings.overall}}
+{%- endif -%}
+{% endif %}
 
 Links:
 {% if game_link -%}
@@ -107,7 +113,7 @@ def parse_steam_store_link(summary: str) -> str:
     return ""
 
 
-def steam_app_rating(html_text):
+def steam_recent_app_rating(html_text):
     tree = html.fromstring(html_text)
     items = tree.xpath(
         '//div[contains(@class, "user_reviews_summary_bar")]'
@@ -121,6 +127,30 @@ def steam_app_rating(html_text):
         LOGGER.debug("Could not parse rating")
 
     return ""
+
+
+def steam_all_app_rating(html_text):
+    tree = html.fromstring(html_text)
+    items = tree.xpath(
+        '//div[contains(@class, "user_reviews")]'
+        '/div[contains(string(), "Overall Reviews")]'
+        '/span[contains(@class, "game_review_summary")]/text()'
+    )
+
+    if items:
+        return items[0]
+    else:
+        LOGGER.debug("Could not parse rating")
+
+    return ""
+
+
+def steam_ratings(html_text):
+    """Tries to get both 'all' and 'recent' ratings."""
+    return {
+        "overall": steam_all_app_rating(html_text),
+        "recent": steam_recent_app_rating(html_text),
+    }
 
 
 class Item(BaseItem):
@@ -205,14 +235,14 @@ class Item(BaseItem):
         return html
 
     def to_slack_message(self):
-        rating = None
+        ratings = None
         if (html := self.get_steam_store_html()) :
-            rating = steam_app_rating(html)
+            ratings = steam_ratings(html)
 
         t = Template(SLACK_BODY_TEMPLATE)
         body = t.render(
             title=self.title,
-            rating=rating,
+            ratings=ratings,
             game_link=self.game_link,
             good_through=self.good_through,
             steam_link=self.steam_link,
