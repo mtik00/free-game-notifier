@@ -12,13 +12,13 @@ def icon_from_url(url: str):
     if not url:
         return
 
-    parts = urlparse(url)
-    if parts.netloc:
-        return f"{parts.scheme}://{parts.netloc}/favicon.ico"
-
     if "steam" in url:
         return "https://store.steampowered.com/favicon.ico"
     elif "epic" in url:
         return "https://www.epicgames.com/favicon.ico"
+
+    parts = urlparse(url)
+    if parts.netloc:
+        return f"{parts.scheme}://{parts.netloc}/favicon.ico"
 
     return None
