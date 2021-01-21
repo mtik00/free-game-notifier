@@ -57,6 +57,10 @@ notifiers:
     slack:
         -
 debug: false
+icons:
+    steam: https://store.steampowered.com/favicon.ico
+    epic: https://www.epicgames.com/favicon.ico
+    humble: https://humblebundle-a.akamaihd.net/static/hashed/47e474eed38083df699b7dfd8d29d575e3398f1e.ico
 """
 
 
