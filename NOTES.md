@@ -15,3 +15,12 @@ Push the `latest` image with:
 Push both `latest` and the versioned image with:
 
     make VERSION=$(poetry version -s) push
+
+# Bumping Version
+
+    poetry version minor \
+    && git add pyproject.toml \
+    && git ci -m"bumping version" \
+    && git tag v$(poetry version -s) \
+    && git push --tags \
+    && make VERSION=$(poetry version -s) push
