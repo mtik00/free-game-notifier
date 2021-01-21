@@ -4,7 +4,6 @@ import pytest
 from free_game_notifier.cache import cache as app_cache
 from free_game_notifier.config import configuration as app_configuration
 
-
 config_yaml = """
 ---
 timezone: "UTC"
@@ -20,11 +19,12 @@ debug: false
 """
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def cache(monkeypatch):
     def mock_save():
         return True
 
+    app_cache.configure()
     monkeypatch.setattr(app_cache, "save", mock_save)
     return app_cache
 

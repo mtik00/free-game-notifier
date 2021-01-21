@@ -25,7 +25,7 @@ class Cache:
         if Cache.__instance is None:
             Cache.__instance = self
         else:
-            LOGGER.warn("Cannot initialize Cache() more than once")
+            LOGGER.warning("Cannot initialize Cache() more than once")
 
     def configure(self, path: Optional[str] = None, age: int = 90):
         self.path = path
@@ -72,7 +72,7 @@ class Cache:
             with open(self.path, "w") as fh:
                 fh.write(json_data)
         else:
-            LOGGER.warn("Cache.save() called without specifying a JSON file.")
+            LOGGER.warning("Cache.save() called without specifying a JSON file.")
 
     def invalidate(self, days_older_than: int = None):
         """

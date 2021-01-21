@@ -76,7 +76,7 @@ class Configuration(MutableMapping):
             self.load_config(config or DEFAULT_PATH or DEFAULT)
             Configuration.__instance = self
         else:
-            LOGGER.warn("Configuration.__init__ called again")
+            LOGGER.warning("Configuration.__init__ called again")
 
     def __getitem__(self, key):
         return self._config.__getitem__(key)

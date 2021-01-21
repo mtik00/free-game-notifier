@@ -87,7 +87,7 @@ def parse_pubdate(pubdate: str) -> pendulum.DateTime:
     try:
         return pendulum.from_format(pubdate, fmt)
     except Exception:
-        LOGGER.warn("Could not parse pubdate: %s", pubdate)
+        LOGGER.warning("Could not parse pubdate: %s", pubdate)
 
     return None
 
@@ -107,7 +107,7 @@ def parse_steam_store_link(summary: str) -> str:
     if match := re.search(r'href="(https://store.steampowered.*?)"', summary):
         return match.group(1)
     else:
-        LOGGER.warn("Could not parse steam store page.  Here's the summary:")
+        LOGGER.warning("Could not parse steam store page.  Here's the summary:")
         LOGGER.debug(summary)
 
     return ""
@@ -280,7 +280,7 @@ class Feed(BaseFeed):
         feed_url = url or self.url
         self._feed = feedparser.parse(feed_url)
         if not self._feed.items:
-            LOGGER.warn("No items found in %s", feed_url)
+            LOGGER.warning("No items found in %s", feed_url)
         else:
             self.filter_pubdate()
             LOGGER.debug("Found %d items in %s", len(self._feed.entries), feed_url)
