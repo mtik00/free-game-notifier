@@ -22,5 +22,5 @@ Push both `latest` and the versioned image with:
     && git add pyproject.toml \
     && git ci -m"bumping version" \
     && git tag v$(poetry version -s) \
-    && git push --tags \
+    && git push && git push --tags \
     && make VERSION=$(poetry version -s) push

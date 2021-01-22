@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "free-game-notifier"
-version = "1.3.0"
+version = "1.3.1"
 description = ""
 authors = ["Tim McFadden <mtik00@users.noreply.github.com>"]
 
