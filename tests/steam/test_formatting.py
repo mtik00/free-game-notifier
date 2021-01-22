@@ -29,3 +29,19 @@ def test_last_light(last_light, monkeypatch):
     monkeypatch.setattr(item, "get_steam_store_html", mock_get_steam_store_html)
     fmt = item.to_slack_message()
     print(fmt["blocks"][0]["text"]["text"])
+
+
+def test_no_icon(last_light, mock_request_raise, monkeypatch):
+    item = Item.from_rss_element(last_light)
+    item.steam_store_link = "tests/steam/files/last_light.html"
+    item.game_link = "http://asdf-zxcv-1234/game/1.html"
+    with open(item.steam_store_link) as fh:
+        html = fh.read()
+
+    def mock_get_steam_store_html():
+        return html
+
+    monkeypatch.setattr(item, "get_steam_store_html", mock_get_steam_store_html)
+
+    data = item.to_slack_message()
+    assert "accessory" not in data["blocks"][0]
