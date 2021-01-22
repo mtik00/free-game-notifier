@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import pytest
+import requests
 from free_game_notifier.cache import cache as app_cache
 from free_game_notifier.config import configuration as app_configuration
 
@@ -33,3 +34,23 @@ def cache(monkeypatch):
 def configuration(monkeypatch):
     app_configuration.load_config(config_yaml)
     return app_configuration
+
+
+@pytest.fixture
+def mock_request(monkeypatch):
+    def mock_get(*args, **kwargs):
+        r = requests.Response()
+        r.status_code = 200
+        return r
+
+    monkeypatch.setattr(requests, "get", mock_get)
+
+
+@pytest.fixture
+def mock_request_raise(monkeypatch):
+    def mock_get(*args, **kwargs):
+        r = requests.Response()
+        r.status_code = 404
+        return r
+
+    monkeypatch.setattr(requests, "get", mock_get)

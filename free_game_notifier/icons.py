@@ -44,5 +44,7 @@ def icon_from_url(url: str):
             LOGGER.warning(
                 "Invalid icon URL (return code %s): %s", response.status_code, icon_url
             )
+        except requests.ConnectionError as e:
+            LOGGER.warning("Error while connecting to %s: %s", icon_url, e)
 
     return None

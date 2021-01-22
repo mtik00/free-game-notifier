@@ -249,7 +249,7 @@ class Item(BaseItem):
             steam_store_link=self.steam_store_link,
         )
 
-        return {
+        data = {
             "text": self.title,
             "blocks": [
                 {
@@ -258,14 +258,19 @@ class Item(BaseItem):
                         "type": "mrkdwn",
                         "text": body,
                     },
-                    "accessory": {
-                        "type": "image",
-                        "image_url": icon_from_url(self.game_link or self.steam_link),
-                        "alt_text": "steam logo",
-                    },
                 },
             ],
         }
+
+        icon_url = icon_from_url(self.game_link or self.steam_link)
+        if icon_url:
+            data["blocks"][0]["accessory"] = {
+                "type": "image",
+                "image_url": icon_url,
+                "alt_text": "store logo",
+            }
+
+        return data
 
 
 class Feed(BaseFeed):
