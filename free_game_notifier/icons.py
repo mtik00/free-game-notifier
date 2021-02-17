@@ -8,8 +8,12 @@ import requests
 from .config import configuration
 
 LOGGER = logging.getLogger(__name__)
-STEAM_ICON = "https://store.steampowered.com/favicon.ico"
-EPIC_ICON = "https://www.epicgames.com/favicon.ico"
+
+default_icon_urls = {
+    "steam": "https://store.steampowered.com/favicon.ico",
+    "epic": "https://www.epicgames.com/favicon.ico",
+    "ubi": "https://www.ubisoft.com/favicon.ico",
+}
 
 
 def icon_from_url(url: str):
@@ -27,10 +31,9 @@ def icon_from_url(url: str):
             return icon_url
 
     # Try some known-good icons
-    if "steam" in url:
-        return STEAM_ICON
-    elif "epic" in url:
-        return EPIC_ICON
+    for partial_string, icon_url in default_icon_urls.items():
+        if partial_string in url:
+            return icon_url
 
     # Try the site's favicon
     parts = urlparse(url)
