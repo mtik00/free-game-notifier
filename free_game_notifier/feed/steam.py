@@ -61,11 +61,11 @@ def parse_good_through(summary: str) -> str:
     # Pendulum doesn't handle the format.  We need to remove the timezone from
     # the string and add it as a parameter and add the year.
     # IOW, convert "December 21, 1600 GMT" to "December 21, 1600 2020".
-    if match := re.search(r"Offer good through (.*?)\<br", summary):
-        parts = match.group(1).split()
+    if match := re.search(r"Offer good (through|thru) (?P<date>.*?)\<br", summary):
+        parts = match.group("date").split()
         tz = parts[-1]
-        new_date = " ".join(parts[:-1]) + f" {pendulum.now(tz=tz).year}"
         try:
+            new_date = " ".join(parts[:-1]) + f" {pendulum.now(tz=tz).year}"
             p = pendulum.from_format(new_date, fmt="MMMM D, Hmm YYYY", tz=tz)
             dt = p.in_tz(configuration["timezone"])
             return dt.format("dddd D-MMM at hA zz"), dt

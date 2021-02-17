@@ -23,3 +23,14 @@ def last_light(feed, configuration):
 @pytest.fixture
 def big_fish(feed, configuration):
     return next((x for x in feed._feed["items"] if "big fish" in x["title"].lower()))
+
+
+@pytest.fixture
+def assassins_creed(feed, configuration):
+    return next(
+        (
+            x
+            for x in feed._feed["items"]
+            if "assassin's creed chronicles" in x["title"].lower()
+        )
+    )
