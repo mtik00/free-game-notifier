@@ -3,7 +3,6 @@
 """
 A base class to provide a default interface for a Notifier.
 """
-from abc import ABC, abstractmethod
 import logging
 
 from ..abc.item import Item
