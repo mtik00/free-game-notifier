@@ -20,6 +20,24 @@ debug: false
 """
 
 
+ignore_config_yaml = """
+---
+timezone: "UTC"
+cache_age: 30
+start_date: 2020-12-01
+feeds:
+    steam:
+        -
+notifiers:
+    slack:
+        -
+debug: false
+ignore:
+    titles:
+      - ".*big fish.*"
+"""
+
+
 @pytest.fixture(autouse=True)
 def cache(monkeypatch):
     def mock_save():
@@ -33,6 +51,12 @@ def cache(monkeypatch):
 @pytest.fixture
 def configuration(monkeypatch):
     app_configuration.load_config(config_yaml)
+    return app_configuration
+
+
+@pytest.fixture
+def ignore_configuration(monkeypatch):
+    app_configuration.load_config(ignore_config_yaml)
     return app_configuration
 
 
