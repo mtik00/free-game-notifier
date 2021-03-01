@@ -29,8 +29,8 @@ icons:
     epic: https://www.epicgames.com/favicon.ico
     humble: https://humblebundle-a.akamaihd.net/static/hashed/47e474eed38083df699b7dfd8d29d575e3398f1e.ico
 
-# Some time you just want to ignore certain games.  These are lists of regular
-# expressions.
+# Some times you want to ignore certain games.
+# These are lists of case-insensitive regular expressions.
 ignore:
     urls:
       - ".*bigfishgames.*"
