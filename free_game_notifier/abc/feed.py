@@ -19,9 +19,5 @@ class Feed(ABC):
         ...
 
     @abstractmethod
-    def get_items(self, count=1):
-        ...
-
-    @abstractmethod
-    def get_nonexpired_items(self, count=1):
+    def get_items(self, count=1, filtered=True):
         ...
