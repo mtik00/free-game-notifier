@@ -4,11 +4,9 @@
 This module retreives and reads a feed from the Steam freegames community.
 """
 import datetime
-import hashlib
 import logging
 import os
 import re
-import time
 
 import feedparser
 import pendulum
@@ -325,21 +323,56 @@ class Feed(BaseFeed):
 
         return element
 
-    def get_nonexpired_items(self, count=1):
-        # Only send the notifier if the offer is still good.  No point otherwise.
-        # The issue is that not all feeds provide this.  If we couldn't parse the
-        # offer "good through" date, then post it anyway.
+    def get_items(self, count=1, filtered=True) -> list[Item]:
         for element in self._feed["items"][:count]:
             item = Item.from_rss_element(element)
 
-            if (not item.good_through_datetime) or (
-                pendulum.now(tz=configuration["timezone"]) < item.good_through_datetime
-            ):
-                LOGGER.debug(f"found: %s...", item.title[:20])
+            if not filtered:
                 yield item
-            else:
-                LOGGER.debug(f"offer expired for %s...", item.title[:20])
+            elif not is_item_ignored(item):
+                yield item
 
-    def get_items(self, count=1) -> list[Item]:
-        for element in self._feed["items"][:count]:
-            yield Item.from_rss_element(element)
+
+def is_item_expired(item: Item) -> bool:
+    expired = False
+    if (
+        item.good_through_datetime
+        and pendulum.now(tz=configuration["timezone"]) >= item.good_through_datetime
+    ):
+        LOGGER.debug("offer expired for %s...", item.title[:20])
+        expired = True
+
+    return expired
+
+
+def is_item_ignored_by_url(item: Item) -> bool:
+    ignore_rules = configuration.get("ignore", {})
+
+    for url_search in ignore_rules.get("urls", []):
+        for url in [item.steam_link, item.steam_store_link, item.game_link]:
+            if not url:
+                continue
+
+            if re.search(url_search, url, re.IGNORECASE):
+                LOGGER.debug("Ignoring url: %s", url)
+                return True
+
+    return False
+
+
+def is_item_ignored_by_title(item: Item) -> bool:
+    ignore_rules = configuration.get("ignore", {})
+
+    for title_search in ignore_rules.get("titles", []):
+        if item.title and re.search(title_search, item.title, re.IGNORECASE):
+            return True
+
+    return False
+
+
+def is_item_ignored(item: Item) -> bool:
+    return (
+        is_item_ignored_by_title(item)
+        or is_item_ignored_by_url(item)
+        or is_item_expired(item)
+    )

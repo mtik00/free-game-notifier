@@ -58,7 +58,7 @@ def process_feed(name, feed_class, url):
     """Process a single feed."""
     try:
         feed = feed_class(url=url)
-        items = feed.get_nonexpired_items(count=10)
+        items = feed.get_items(count=10)
     except Exception:
         LOGGER.error("Could not parse %s", url, exc_info=True)
         return
