@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
-from contextlib import contextmanager
 
-import pendulum
 import typer
 
 from .cache import cache
