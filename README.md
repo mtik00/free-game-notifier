@@ -49,6 +49,10 @@ You can build the image yourself with:
 
     docker build -t my-free-game-notifier -f docker/Dockerfile .
 
+To build the arm version, don't forget to install the cross-platform builders.  Easy button:
+
+    docker run --privileged --rm tonistiigi/binfmt --install all
+
 ## docker-compose
 
 This project also has a sample `docker-compose.yml` file that you can use.

@@ -48,7 +48,7 @@ Links:
 """
 
 
-def parse_good_through(summary: str) -> str:
+def parse_good_through(summary: str, year:int = pendulum.now().year) -> str:
     """
     Converts the "Good through" string in the announcement to the local timezone.
 
@@ -63,7 +63,7 @@ def parse_good_through(summary: str) -> str:
         parts = match.group("date").split()
         tz = parts[-1]
         try:
-            new_date = " ".join(parts[:-1]) + f" {pendulum.now(tz=tz).year}"
+            new_date = " ".join(parts[:-1]) + f" {year}"
             p = pendulum.from_format(new_date, fmt="MMMM D, Hmm YYYY", tz=tz)
             dt = p.in_tz(configuration["timezone"])
             return dt.format("dddd D-MMM at hA zz"), dt
@@ -167,11 +167,11 @@ class Item(BaseItem):
         self.steam_link = steam_link
         self.game_link = game_link
         self.posted = posted
-        self.good_through, self.good_through_datetime = parse_good_through(self.summary)
-        self.steam_store_link = parse_steam_store_link(self.summary)
-
         self.published = published
-        self.published_datetime = parse_pubdate(self.published)
+
+        self.published_datetime = parse_pubdate(published)
+        self.steam_store_link = parse_steam_store_link(summary)
+        self.good_through, self.good_through_datetime = parse_good_through(self.summary, year=self.published_datetime.year)
 
         # See if we can parse the direct link.
         if (not game_link) and (
