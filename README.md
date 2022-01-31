@@ -51,7 +51,8 @@ You can build the image yourself with:
 
 To build the arm version, don't forget to install the cross-platform builders.  Easy button:
 
-    docker run --privileged --rm tonistiigi/binfmt --install all
+    docker buildx create --name xplatform --platform "linux/amd64,linux/arm64"
+    docker buildx use xplatform
 
 ## docker-compose
 
