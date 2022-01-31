@@ -1,4 +1,4 @@
-FROM python:3.9.1-buster as compile
+FROM python:3.9-buster as compile
 
 RUN python -m venv --copies /tmp/app-env
 
@@ -24,7 +24,7 @@ RUN sed -i '1s|.*python$|#!/usr/bin/env python|' /tmp/app-env/bin/*
 #     echo "alias ll='ls -alh'" >> /root/.bashrc
 
 ###############################################################################
-FROM python:3.9.1-slim-buster
+FROM python:3.9-slim-buster
 ARG  USERID=9000
 
 ENV PYTHONUNBUFFERED=1 \
