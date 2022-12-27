@@ -1,5 +1,5 @@
 version: "3.9"
-   
+
 services:
   sfn:
     image: mtik00/free-game-notifier:latest
@@ -11,6 +11,7 @@ services:
       - python
       - app.py
       - --debug
+      # --dry-run
     volumes:
       - ${PWD}:/tmp/app_config:ro
       - ${PWD}/app_cache:/tmp/app_cache
