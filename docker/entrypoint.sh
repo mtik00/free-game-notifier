@@ -57,11 +57,11 @@ function process_args() {
     done
 
     if [[ $DEBUG -eq 1 ]]; then
-        APP_ARGS=(${APP_ARGS[@]} "--debug")
+        APP_ARGS=("${APP_ARGS[@]}" "--debug")
     fi
 
     if [[ $DRY_RUN -eq 1 ]]; then
-        APP_ARGS=(${APP_ARGS[@]} "--dry-run")
+        APP_ARGS=("${APP_ARGS[@]}" "--dry-run")
     fi
 }
 
@@ -87,12 +87,12 @@ function run_cron() {
 }
 
 function run_app() {
-    log $(printf "Running: %s %s" "python -m free_game_notifier.app" $( array_join APP_ARGS ))
-    python -m free_game_notifier.app ${APP_ARGS[@]/#/}
+    log "$(printf "Running: %s %s" "python -m free_game_notifier.app" "$( array_join APP_ARGS )")"
+    python -m free_game_notifier.app "${APP_ARGS[@]/#/}"
 }
 
 function main() {
-    process_args $@
+    process_args "$@"
 
     if [ $CRON -eq 1 ]; then
         run_cron
@@ -101,4 +101,4 @@ function main() {
     fi
 }
 
-main $@
+main "$@"
