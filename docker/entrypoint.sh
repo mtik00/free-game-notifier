@@ -6,7 +6,7 @@ CRON=0
 CRON_SCHEDULE='0 */2 * * *'
 DEBUG=0
 DRY_RUN=0
-APP_ARGS=()
+APP_ARGS=""
 
 function log.error() {
     printf "%s [ERROR] %s\n" "$(date +'%Y-%m-%d %H:%M:%S%z')" "$@" >&2
@@ -56,18 +56,22 @@ function process_args() {
         esac
     done
 
+    local app_args_array=()
+
     if [[ $DEBUG -eq 1 ]]; then
-        APP_ARGS=(${APP_ARGS[@]} "--debug")
+        app_args_array=(${app_args_array[@]} "--debug")
     fi
 
     if [[ $DRY_RUN -eq 1 ]]; then
-        APP_ARGS=(${APP_ARGS[@]} "--dry-run")
+        app_args_array=(${app_args_array[@]} "--dry-run")
     fi
+
+    printf -v APP_ARGS "%s " "${app_args_array[@]}"
+    APP_ARGS=${APP_ARGS%?}
 }
 
 function run_cron() {
-    printf -v app_args "%s " "${APP_ARGS[@]}"
-    echo "${CRON_SCHEDULE} free_games_notifier python -m free_game_notifier.app ${app_args%?}" > /etc/cron.d/free-game-notifier
+    echo "${CRON_SCHEDULE} free_games_notifier python -m free_game_notifier.app ${APP_ARGS}" > /etc/cron.d/free-game-notifier
     chmod 644 /etc/cron.d/free-game-notifier
     cron -f
 }
