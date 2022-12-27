@@ -101,7 +101,7 @@ def main(
     configuration["dry-run"] = dry_run
 
     LOGGER.debug("Loaded configuration from %s", config_path)
-
+    LOGGER.debug(configuration.__dict__)
     cache.configure(path=configuration["cache_path"], age=configuration["cache_age"])
     cache.invalidate()
 
