@@ -72,8 +72,8 @@ function run_cron() {
 }
 
 function run_app() {
-    printf "Running: %s %s\n" "python -m free_game_notifier.app" $(printf " %s" "${APP_ARGS[@]}")
-    python -m free_game_notifier.app $(printf " %s" "${APP_ARGS[@]}")
+    log $(printf "Running: %s %s\n" "python -m free_game_notifier.app" $(echo ${APP_ARGS[@]} | xargs))
+    python -m free_game_notifier.app "${APP_ARGS[@]/#/}"
 }
 
 function main() {
