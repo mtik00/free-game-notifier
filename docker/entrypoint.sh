@@ -66,7 +66,8 @@ function process_args() {
 }
 
 function run_cron() {
-    printf '%s free_games_finder %s' ${CRON_SCHEDULE} 'python app.py' > /etc/cron.d/free-game-notifier
+    printf -v app_args "%s " "${APP_ARGS[@]}"
+    echo "${CRON_SCHEDULE} free_games_notifier python -m free_game_notifier.app ${app_args%?}" > /etc/cron.d/free-game-notifier
     chmod 644 /etc/cron.d/free-game-notifier
     cron -f
 }
