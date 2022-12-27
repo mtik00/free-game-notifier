@@ -4,7 +4,6 @@ VERSION := latest
 PLATFORMS = linux/amd64,linux/arm64
 
 build:
-
 	docker build --load -t mtik00/free-game-notifier:latest -f docker/Dockerfile --pull .
     ifneq ($(VERSION),latest)
 	    docker build -t mtik00/free-game-notifier:$(VERSION) -f docker/Dockerfile --pull .

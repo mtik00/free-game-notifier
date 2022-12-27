@@ -1,23 +1,17 @@
 FROM python:3.10-bullseye as compile
 
-RUN python -m venv --copies /tmp/app-env
+RUN python -m venv --copies /usr/src/app/.venv
 
-ENV PATH=/tmp/app-env/bin:$PATH \
+ENV PATH=/usr/src/app/.venv:$PATH \
     POETRY_VIRTUALENVS_CREATE=false
 
-WORKDIR /tmp/app-build
+WORKDIR /usr/src/app
 
-COPY ./pyproject.toml .
-COPY ./poetry.lock .
+COPY ./pyproject.toml ./poetry.lock /usr/src/app
 
 RUN python -m pip install --no-compile --upgrade pip wheel poetry
 RUN poetry install --no-dev --no-root -n && \
     find . -name "*.py[co]" -o -name __pycache__ -exec rm -rf {} +
-
-# Make the virtual env portable
-RUN sed -i '40s|.*|VIRTUAL_ENV="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}" )")" \&\& pwd)"|' /tmp/app-env/bin/activate
-RUN sed -i '1s|.*|#!/usr/bin/env python|' /tmp/app-env/bin/pip*
-RUN sed -i '1s|.*python$|#!/usr/bin/env python|' /tmp/app-env/bin/*
 
 # Stuff to help debug
 # RUN apt-get update && apt-get install -y vim wget curl dnsutils && \
@@ -36,7 +30,7 @@ LABEL maintainer="Tim McFadden <mtik00@users.noreply.github.com>"
 LABEL app="free-game-notifier"
 
 RUN apt-get update && apt-get upgrade -y \
-    && apt-get install -y tini \
+    && apt-get install -y tini cron \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --uid ${USERID} -ms /bin/bash free_game_notifier \
@@ -45,14 +39,23 @@ RUN useradd --uid ${USERID} -ms /bin/bash free_game_notifier \
 
 WORKDIR /usr/src/app
 
-COPY --from=compile --chown=free_game_notifier:free_game_notifier /tmp/app-env .venv
+RUN touch /etc/cron.d/free-game-notifier && \
+    chmod 0644 /etc/cron.d/free-game-notifier && \
+    chown free_game_notifier:free_game_notifier /etc/cron.d/free-game-notifier
+
+COPY --from=compile --chown=free_game_notifier:free_game_notifier /usr/src/app/.venv .venv
 COPY --chown=free_game_notifier:free_game_notifier ./free_game_notifier ./free_game_notifier
-COPY --chown=free_game_notifier:free_game_notifier ./docker/app.py .
+COPY --chown=free_game_notifier:free_game_notifier ./docker/app.py ./docker/entrypoint.sh /usr/src/app/
+
+# Allow the app user to run cron
+RUN crontab -u free_game_notifier /etc/cron.d/free-game-notifier
+RUN chmod u+s /usr/sbin/cron
+RUN touch /var/log/cron.log
 
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
-CMD [ "python", "app.py" ]
+CMD [ "entrypoint.sh" ]
 
 # Stuff to help debug
-# RUN python -m pip install ipdb
+# RUN apt-get update && apt-get install -y vim curl && python -m pip install --upgrade pip ipdb
 
 USER free_game_notifier
