@@ -66,8 +66,21 @@ function process_args() {
         app_args_array=(${app_args_array[@]} "--dry-run")
     fi
 
-    printf -v APP_ARGS "%s " "${app_args_array[@]}"
-    APP_ARGS=${APP_ARGS%?}
+    APP_ARGS=$( array_join app_args_array )
+}
+
+function array_join() {
+    # Join an array with a a separator character.
+    # WARNING: This only works in bash.  You should also pass the array by
+    #          reference.  Example:
+    #          my_array=( "one" "two" "three")
+    #          joined=$( array_join my_array "|")
+    local -n arr=$1
+    local sep=${2:-" "}
+    printf -v result "%s${sep}" "${arr[@]}"
+
+    # strip the last separator character
+    echo "${result%?}"
 }
 
 function run_cron() {
