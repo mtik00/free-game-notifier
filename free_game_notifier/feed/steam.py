@@ -61,7 +61,7 @@ def parse_good_through(summary: str, year:int = pendulum.now().year) -> str:
     # IOW, convert "December 21, 1600 GMT" to "December 21, 1600 2020".
     if match := re.search(r"Offer good (through|thru) (?P<date>.*?)\<br", summary):
         parts = match.group("date").split()
-        tz = parts[-1]
+        tz = parts[-1].rstrip(".")
         try:
             new_date = " ".join(parts[:-1]) + f" {year}"
             p = pendulum.from_format(new_date, fmt="MMMM D, Hmm YYYY", tz=tz)
