@@ -45,7 +45,7 @@ RUN touch /etc/cron.d/free-game-notifier && \
 
 COPY --from=compile --chown=free_game_notifier:free_game_notifier /usr/src/app/.venv .venv
 COPY --chown=free_game_notifier:free_game_notifier ./free_game_notifier ./free_game_notifier
-COPY --chown=free_game_notifier:free_game_notifier ./docker/app.py ./docker/entrypoint.sh /usr/src/app/
+COPY --chown=free_game_notifier:free_game_notifier ./docker/entrypoint.sh /usr/src/app/
 
 # Allow the app user to run cron
 RUN crontab -u free_game_notifier /etc/cron.d/free-game-notifier
