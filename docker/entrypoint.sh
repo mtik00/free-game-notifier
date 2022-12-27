@@ -5,6 +5,8 @@ IFS=$'\n\t'
 CRON=0
 CRON_SCHEDULE='0 */2 * * *'
 DEBUG=0
+DRY_RUN=0
+APP_ARGS=()
 
 function log.error() {
     printf "%s [ERROR] %s\n" "$(date +'%Y-%m-%d %H:%M:%S%z')" "$@" >&2
@@ -22,6 +24,7 @@ Available Flags:
     -c|--cron        Run 'cron -f' instead of the application
     -s|--sched       Cron schedule (e.g. '0 */2 * * *')
     -d|--debug       Run the application in debug mode (more output)
+    --dry-run        Don't send the notifications
     -h|--help        Print help
 EOF
 }
@@ -46,8 +49,20 @@ function process_args() {
                 DEBUG=1
                 shift
                 ;;
+            --dry-run)
+                DRY_RUN=1
+                shift
+                ;;
         esac
     done
+
+    if [[ $DEBUG -eq 1 ]]; then
+        APP_ARGS=(${APP_ARGS[@]} "--debug")
+    fi
+
+    if [[ $DRY_RUN -eq 1 ]]; then
+        APP_ARGS=(${APP_ARGS[@]} "--dry-run")
+    fi
 }
 
 function run_cron() {
@@ -57,7 +72,8 @@ function run_cron() {
 }
 
 function run_app() {
-    python app.py
+    printf "Running: %s %s\n" "python -m free_game_notifier.app" $(printf " %s" "${APP_ARGS[@]}")
+    python -m free_game_notifier.app $(printf " %s" "${APP_ARGS[@]}")
 }
 
 function main() {
@@ -71,5 +87,3 @@ function main() {
 }
 
 main $@
-
-exit $EXIT_CODE

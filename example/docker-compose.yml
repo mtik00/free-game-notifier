@@ -8,10 +8,10 @@ services:
       - SFN_APP_CONFIG_PATH=/tmp/app_config/settings.yml
       - SFN_APP_DEBUG=1
     command:
-      - python
-      - app.py
+      - entrypoint.sh
+      - --cron
       - --debug
-      # --dry-run
+      - --dry-run
     volumes:
       - ${PWD}:/tmp/app_config:ro
       - ${PWD}/app_cache:/tmp/app_cache
