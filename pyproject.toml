@@ -23,6 +23,9 @@ pylint = "^2.15.9"
 ipdb = "^0.13.11"
 ipython = "^8.7.0"
 
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.21.0"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
